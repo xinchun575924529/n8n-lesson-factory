@@ -1,0 +1,38 @@
+{
+  "id": 8965,
+  "slug": "generate-and-publish-social-posts-with-gemini-ki",
+  "dir": "projects/8965-generate-and-publish-social-posts-with-gemini-ki",
+  "name": "Generate and publish social posts with Gemini, Kie.ai, and Zernio API",
+  "url": "https://n8n.io/workflows/8965/",
+  "views": 2058,
+  "recent": 204,
+  "nodeCount": 9,
+  "nodeTypes": [
+    "httpRequest",
+    "if",
+    "merge",
+    "set",
+    "wait",
+    "respondToWebhook",
+    "stickyNote",
+    "code"
+  ],
+  "selection": {
+    "mode": "A",
+    "at": "2026/9/8 06:10:19",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "backlog",
+  "createdAt": "2026/9/8 06:10:19",
+  "updatedAt": "2026/9/8 06:10:19",
+  "history": [
+    {
+      "at": "2026/9/8 06:10:19",
+      "event": "selected",
+      "mode": "A"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/8965-generate-and-publish-social-posts-with-gemini-ki"
+  }
+}
