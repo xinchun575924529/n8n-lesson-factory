@@ -1,0 +1,38 @@
+{
+  "id": 17522,
+  "slug": "triage-telegram-voice-and-text-support-with-groq",
+  "dir": "projects/17522-triage-telegram-voice-and-text-support-with-groq",
+  "name": "Triage Telegram voice and text support with Groq LLMs and Google Sheets",
+  "url": "https://n8n.io/workflows/17522/",
+  "views": 829,
+  "recent": 21,
+  "nodeCount": 9,
+  "nodeTypes": [
+    "googleSheets",
+    "httpRequest",
+    "if",
+    "slack",
+    "telegram",
+    "telegramTrigger",
+    "switch",
+    "stickyNote"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/9/8 12:21:37",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/9/8 12:21:37",
+  "updatedAt": "2026/9/8 12:21:37",
+  "history": [
+    {
+      "at": "2026/9/8 12:21:37",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/17522-triage-telegram-voice-and-text-support-with-groq"
+  }
+}
