@@ -1,0 +1,561 @@
+{
+  "name": "8270 L2-C 免费替代版",
+  "nodes": [
+    {
+      "id": "t",
+      "name": "启动",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "测试单",
+      "name": "测试单",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -380,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{json:{caption:'手持展示新款能量饮料，健身房清晨氛围', product_desc:'一罐银色 MockBrand 能量饮料，500ml拉环罐，罐身绿色闪电logo', chat_id:'mock-chat-1'}}];"
+      }
+    },
+    {
+      "id": "DeepSeek: 图像分析(替身)",
+      "name": "DeepSeek: 图像分析(替身)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        0
+      ],
+      "parameters": {
+        "url": "https://api.deepseek.com/v1/chat/completions",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"model\": \"deepseek-chat\", \"messages\": [{\"role\": \"system\", \"content\": \"你是图像分析助手。用户会给你一段产品图的文字描述，请按模板规则仅输出 YAML（product 或 character 结构，与视觉版一致）。\"}, {\"role\": \"user\", \"content\": \"=产品图文字描述：{{ $json.product_desc }}\"}], \"temperature\": 0.7, \"max_tokens\": 1400}",
+        "options": {
+          "timeout": 90000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fra8VO4w0TLBP9JO",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "id": "解析YAML描述",
+      "name": "解析YAML描述",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        60,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; const base=$('测试单').item.json; const yaml=it.choices[0].message.content; return [{json:{...base, IMAGE_DESCRIPTION: yaml.replace(/```yaml|```/g,'').trim()}}];"
+      }
+    },
+    {
+      "id": "DeepSeek: UGC生图提示词",
+      "name": "DeepSeek: UGC生图提示词",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        280,
+        0
+      ],
+      "parameters": {
+        "url": "https://api.deepseek.com/v1/chat/completions",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"model\": \"deepseek-chat\", \"messages\": [{\"role\": \"system\", \"content\": \"=ROLE: UGC Image Prompt Builder  \\n\\nGOAL:  \\nGenerate one concise, natural, and realistic image prompt (≤120 words) from a given product or reference image. The prompt must simulate authentic UGC (user-generated content) photography.  \\n\\nRULES:  \\n- Always output **one JSON object only** with the key:  \\n  - `image_prompt`: (string with full description)  \\n- Do **not** add commentary, metadata, or extra keys. JSON only.  \\n\\nSTYLE GUIDELINES:  \\n- Tone: casual, unstaged, lifelike, handheld snapshot.  \\n- Camera cues: include at least 2–3 (e.g., phone snapshot, handheld framing, off-center composition, natural indoor light, soft shadows, slight motion blur, auto exposure, unpolished look, mild grain).  \\n- Realism: embrace imperfections (wrinkles, stray hairs, skin texture, clutter, smudges).  \\n- Packaging/Text: preserve exactly as visible. Never invent claims, numbers, or badges.  \\n- Diversity: if people appear but are unspecified, vary gender/ethnicity naturally; default age range = 21–38.  \\n- Setting: default to real-world everyday spaces (home, street, store, gym, office).  \\n\\nSAFETY:  \\n- No copyrighted character names.  \\n- No dialogue or scripts. Only describe scenes.  \\n\\nOUTPUT CONTRACT:  \\n- JSON only, no prose outside.  \\n- Max 120 words in `image_prompt`.  \\n- Must cover: subject, action, mood, setting, style/camera, colors, and text accuracy.  \\n\\nCHECKLIST BEFORE OUTPUT:  \\n- Natural handheld tone?  \\n- At least 2 camera cues included?  \\n- Product text preserved exactly?  \\n- Only JSON returned?  \\n\\n---  \\n\\n### Example  \\n\\nGood Example :  \\n```json\\n{ \\\"image_prompt\\\": \\\"a young adult casually holding a skincare tube near a bathroom mirror; action: dabs small amount on the back of the hand; mood: easy morning; setting: small apartment bathroom with towel on rack and toothbrush cup; style/camera: phone snapshot, handheld framing, off-center composition, natural window light, slight motion blur, mild grain; colors: soft whites and mint label; text accuracy: keep every word on the tube exactly as visible, no added claims\\\" }\\n\"}, {\"role\": \"user\", \"content\": \"=User's description:\\n{{ $json.caption }}\\n\\nReference image description:\\n{{ $json.IMAGE_DESCRIPTION }}\"}], \"temperature\": 0.7, \"max_tokens\": 1400}",
+        "options": {
+          "timeout": 90000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fra8VO4w0TLBP9JO",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "id": "解析提示词JSON",
+      "name": "解析提示词JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; const m=it.choices[0].message.content.match(/\\{[\\s\\S]*\\}/); const o=JSON.parse(m[0]); if(!o.image_prompt||o.image_prompt.split(' ').length>130) throw new Error('image_prompt 契约失败'); return [{json:{...it, image_prompt:o.image_prompt}}];"
+      }
+    },
+    {
+      "id": "NanoBanana替身: 本地合成场景图",
+      "name": "NanoBanana替身: 本地合成场景图",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const {execSync}=require('child_process'); const it=$input.first().json; execSync('python \\\"C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\scripts\\\\8270-c-render-image.py\\\"'); return [{json:{...it, edited_png:'C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\8270-c-data\\\\edited.png'}}];"
+      }
+    },
+    {
+      "id": "DeepSeek: 生成VEO3脚本",
+      "name": "DeepSeek: 生成VEO3脚本",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        940,
+        0
+      ],
+      "parameters": {
+        "url": "https://api.deepseek.com/v1/chat/completions",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"model\": \"deepseek-chat\", \"messages\": [{\"role\": \"system\", \"content\": \"=system_prompt:\\n  ## SYSTEM PROMPT: Structured Video Ad Prompt Generator\\n  A - Ask:\\n    Generate a structured video ad prompt for cinematic generation, strictly based on the master schema provided in: {\\n  \\\"description\\\": \\\"Brief narrative description of the scene, focusing on key visual storytelling and product transformation.\\\",\\n  \\\"style\\\": \\\"cinematic | photorealistic | stylized | gritty | elegant\\\",\\n  \\\"camera\\\": {\\n    \\\"type\\\": \\\"fixed | dolly | Steadicam | crane combo\\\",\\n    \\\"movement\\\": \\\"describe any camera moves like slow push-in, pan, orbit\\\",\\n    \\\"lens\\\": \\\"optional lens type or focal length for cinematic effect\\\"\\n  },\\n  \\\"lighting\\\": {\\n    \\\"type\\\": \\\"natural | dramatic | high-contrast\\\",\\n    \\\"sources\\\": \\\"key lighting sources (sunset, halogen, ambient glow...)\\\",\\n    \\\"FX\\\": \\\"optional VFX elements like fog, reflections, flares\\\"\\n  },\\n  \\\"environment\\\": {\\n    \\\"location\\\": \\\"describe location or room (kitchen, desert, basketball court...)\\\",\\n    \\\"set_pieces\\\": [\\n      \\\"list of key background or prop elements\\\",\\n      \\\"e.g. hardwood floors, chain-link fence, velvet surface\\\"\\n    ],\\n    \\\"mood\\\": \\\"describe the ambient atmosphere (moody, clean, epic...)\\\"\\n  },\\n  \\\"elements\\\": [\\n    \\\"main physical items involved (product box, accessories, vehicles...)\\\",\\n    \\\"include brand visibility (logos, packaging, texture...)\\\"\\n  ],\\n  \\\"subject\\\": {\\n    \\\"character\\\": {\\n      \\\"description\\\": \\\"optional – physical description, outfit\\\",\\n      \\\"pose\\\": \\\"optional – position or gesture\\\",\\n      \\\"lip_sync_line\\\": \\\"optional – spoken line if there’s a voiceover\\\"\\n    },\\n    \\\"product\\\": {\\n      \\\"brand\\\": \\\"Brand name\\\",\\n      \\\"model\\\": \\\"Product model or name\\\",\\n      \\\"action\\\": \\\"description of product transformation or assembly\\\"\\n    }\\n  },\\n  \\\"motion\\\": {\\n    \\\"type\\\": \\\"e.g. transformation, explosion, vortex\\\",\\n    \\\"details\\\": \\\"step-by-step visual flow of how elements move or evolve\\\"\\n  },\\n  \\\"VFX\\\": {\\n    \\\"transformation\\\": \\\"optional – describe style (neon trails, motion blur...)\\\",\\n    \\\"impact\\\": \\\"optional – e.g. shockwave, glow, distortion\\\",\\n    \\\"particles\\\": \\\"optional – embers, sparks, thread strands...\\\",\\n    \\\"environment\\\": \\\"optional – VFX affecting the scene (ripples, wind...)\\\"\\n  },\\n  \\\"audio\\\": {\\n    \\\"music\\\": \\\"optional – cinematic score, trap beat, ambient tone\\\",\\n    \\\"sfx\\\": [\\n      \\\"list of sound effects (zip, pop, woosh...)\\\"\\n    ],\\n    \\\"ambience\\\": \\\"optional – background soundscape (traffic, wind...)\\\",\\n    \\\"voiceover\\\": {\\n      \\\"delivery\\\": \\\"tone and style (confident, whisper, deep...)\\\",\\n      \\\"line\\\": \\\"text spoken if applicable\\\"\\n    }\\n  },\\n  \\\"ending\\\": \\\"Final shot description – what is seen or felt at the end (freeze frame, logo pulse, glow...)\\\",\\n  \\\"text\\\": \\\"none | overlay | tagline | logo pulse at end only\\\",\\n  \\\"format\\\": \\\"16:9 | 4k | vertical\\\",\\n  \\\"keywords\\\": [\\n    \\\"brand\\\",\\n    \\\"scene style\\\",\\n    \\\"motion type\\\",\\n    \\\"camera style\\\",\\n    \\\"sound mood\\\",\\n    \\\"target theme\\\"\\n  ]\\n}\\n.\\n    The final result must be a JSON object with exactly two top-level keys: `title` and `final_prompt`.\\n\\n  G - Guidance:\\n    role: Creative Director\\n    output_count: 1\\n    character_limit: None\\n    constraints:\\n      - The output must be valid JSON.\\n      - The `title` field should contain a short, descriptive and unique title (max 15 words).\\n      - The `final_prompt` field must contain a **single-line JSON string** that follows the exact structure of {\\n  \\\"description\\\": \\\"Brief narrative description of the scene, focusing on key visual storytelling and product transformation.\\\",\\n  \\\"style\\\": \\\"cinematic | photorealistic | stylized | gritty | elegant\\\",\\n  \\\"camera\\\": {\\n    \\\"type\\\": \\\"fixed | dolly | Steadicam | crane combo\\\",\\n    \\\"movement\\\": \\\"describe any camera moves like slow push-in, pan, orbit\\\",\\n    \\\"lens\\\": \\\"optional lens type or focal length for cinematic effect\\\"\\n  },\\n  \\\"lighting\\\": {\\n    \\\"type\\\": \\\"natural | dramatic | high-contrast\\\",\\n    \\\"sources\\\": \\\"key lighting sources (sunset, halogen, ambient glow...)\\\",\\n    \\\"FX\\\": \\\"optional VFX elements like fog, reflections, flares\\\"\\n  },\\n  \\\"environment\\\": {\\n    \\\"location\\\": \\\"describe location or room (kitchen, desert, basketball court...)\\\",\\n    \\\"set_pieces\\\": [\\n      \\\"list of key background or prop elements\\\",\\n      \\\"e.g. hardwood floors, chain-link fence, velvet surface\\\"\\n    ],\\n    \\\"mood\\\": \\\"describe the ambient atmosphere (moody, clean, epic...)\\\"\\n  },\\n  \\\"elements\\\": [\\n    \\\"main physical items involved (product box, accessories, vehicles...)\\\",\\n    \\\"include brand visibility (logos, packaging, texture...)\\\"\\n  ],\\n  \\\"subject\\\": {\\n    \\\"character\\\": {\\n      \\\"description\\\": \\\"optional – physical description, outfit\\\",\\n      \\\"pose\\\": \\\"optional – position or gesture\\\",\\n      \\\"lip_sync_line\\\": \\\"optional – spoken line if there’s a voiceover\\\"\\n    },\\n    \\\"product\\\": {\\n      \\\"brand\\\": \\\"Brand name\\\",\\n      \\\"model\\\": \\\"Product model or name\\\",\\n      \\\"action\\\": \\\"description of product transformation or assembly\\\"\\n    }\\n  },\\n  \\\"motion\\\": {\\n    \\\"type\\\": \\\"e.g. transformation, explosion, vortex\\\",\\n    \\\"details\\\": \\\"step-by-step visual flow of how elements move or evolve\\\"\\n  },\\n  \\\"VFX\\\": {\\n    \\\"transformation\\\": \\\"optional – describe style (neon trails, motion blur...)\\\",\\n    \\\"impact\\\": \\\"optional – e.g. shockwave, glow, distortion\\\",\\n    \\\"particles\\\": \\\"optional – embers, sparks, thread strands...\\\",\\n    \\\"environment\\\": \\\"optional – VFX affecting the scene (ripples, wind...)\\\"\\n  },\\n  \\\"audio\\\": {\\n    \\\"music\\\": \\\"optional – cinematic score, trap beat, ambient tone\\\",\\n    \\\"sfx\\\": [\\n      \\\"list of sound effects (zip, pop, woosh...)\\\"\\n    ],\\n    \\\"ambience\\\": \\\"optional – background soundscape (traffic, wind...)\\\",\\n    \\\"voiceover\\\": {\\n      \\\"delivery\\\": \\\"tone and style (confident, whisper, deep...)\\\",\\n      \\\"line\\\": \\\"text spoken if applicable\\\"\\n    }\\n  },\\n  \\\"ending\\\": \\\"Final shot description – what is seen or felt at the end (freeze frame, logo pulse, glow...)\\\",\\n  \\\"text\\\": \\\"none | overlay | tagline | logo pulse at end only\\\",\\n  \\\"format\\\": \\\"16:9 | 4k | vertical\\\",\\n  \\\"keywords\\\": [\\n    \\\"brand\\\",\\n    \\\"scene style\\\",\\n    \\\"motion type\\\",\\n    \\\"camera style\\\",\\n    \\\"sound mood\\\",\\n    \\\"target theme\\\"\\n  ]\\n}\\n with all fields preserved.\\n      - Do not include any explanations, markdown, or extra text — only the JSON object.\\n      - Escape all inner quotes in the `final_prompt` string so it is valid as a stringified JSON inside another JSON.\\n    tool_usage:\\n      - Ensure consistent alignment across all fields (camera, lighting, motion, etc.).\\n      - Maintain full structure even for optional fields (use \\\"none\\\", \\\"\\\", or [] as needed).\\n\\n  N - Notation:\\n    format: JSON\\n    expected_output:\\n      {\\n        \\\"title\\\": \\\"A unique short title for the scene\\\",\\n        \\\"final_prompt\\\": \\\"{...stringified JSON of the full prompt...}\\\"\\n      }\\n\\n\"}, {\"role\": \"user\", \"content\": \"=Create a UGC-style video prompt.\\n\\nUser description:\\n{{ $('测试单').item.json.caption }}\\n\\nReference image analysis:\\n{{ $json.IMAGE_DESCRIPTION }}\\n\\njson_master:\\n{\\\\n  \\\"description\\\": \\\"Brief narrative description of the scene, focusing on key visual storytelling and product transformation.\\\",\\\\n  \\\"style\\\": \\\"cinematic | photorealistic | stylized | gritty | elegant\\\",\\\\n  \\\"camera\\\": {\\\\n    \\\"type\\\": \\\"fixed | dolly | Steadicam | crane combo\\\",\\\\n    \\\"movement\\\": \\\"describe any camera moves like slow push-in, pan, orbit\\\",\\\\n    \\\"lens\\\": \\\"optional lens type or focal length for cinematic effect\\\"\\\\n  },\\\\n  \\\"lighting\\\": {\\\\n    \\\"type\\\": \\\"natural | dramatic | high-contrast\\\",\\\\n    \\\"sources\\\": \\\"key lighting sources (sunset, halogen, ambient glow...)\\\",\\\\n    \\\"FX\\\": \\\"optional VFX elements like fog, reflections, flares\\\"\\\\n  },\\\\n  \\\"environment\\\": {\\\\n    \\\"location\\\": \\\"describe location or room (kitchen, desert, basketball court...)\\\",\\\\n    \\\"set_pieces\\\": [\\\\n      \\\"list of key background or prop elements\\\",\\\\n      \\\"e.g. hardwood floors, chain-link fence, velvet surface\\\"\\\\n    ],\\\\n    \\\"mood\\\": \\\"describe the ambient atmosphere (moody, clean, epic...)\\\"\\\\n  },\\\\n  \\\"elements\\\": [\\\\n    \\\"main physical items involved (product box, accessories, vehicles...)\\\",\\\\n    \\\"include brand visibility (logos, packaging, texture...)\\\"\\\\n  ],\\\\n  \\\"subject\\\": {\\\\n    \\\"character\\\": {\\\\n      \\\"description\\\": \\\"optional – physical description, outfit\\\",\\\\n      \\\"pose\\\": \\\"optional – position or gesture\\\",\\\\n      \\\"lip_sync_line\\\": \\\"optional – spoken line if there’s a voiceover\\\"\\\\n    },\\\\n    \\\"product\\\": {\\\\n      \\\"brand\\\": \\\"Brand name\\\",\\\\n      \\\"model\\\": \\\"Product model or name\\\",\\\\n      \\\"action\\\": \\\"description of product transformation or assembly\\\"\\\\n    }\\\\n  },\\\\n  \\\"motion\\\": {\\\\n    \\\"type\\\": \\\"e.g. transformation, explosion, vortex\\\",\\\\n    \\\"details\\\": \\\"step-by-step visual flow of how elements move or evolve\\\"\\\\n  },\\\\n  \\\"VFX\\\": {\\\\n    \\\"transformation\\\": \\\"optional – describe style (neon trails, motion blur...)\\\",\\\\n    \\\"impact\\\": \\\"optional – e.g. shockwave, glow, distortion\\\",\\\\n    \\\"particles\\\": \\\"optional – embers, sparks, thread strands...\\\",\\\\n    \\\"environment\\\": \\\"optional – VFX affecting the scene (ripples, wind...)\\\"\\\\n  },\\\\n  \\\"audio\\\": {\\\\n    \\\"music\\\": \\\"optional – cinematic score, trap beat, ambient tone\\\",\\\\n    \\\"sfx\\\": [\\\\n      \\\"list of sound effects (zip, pop, woosh...)\\\"\\\\n    ],\\\\n    \\\"ambience\\\": \\\"optional – background soundscape (traffic, wind...)\\\",\\\\n    \\\"voiceover\\\": {\\\\n      \\\"delivery\\\": \\\"tone and style (confident, whisper, deep...)\\\",\\\\n      \\\"line\\\": \\\"text spoken if applicable\\\"\\\\n    }\\\\n  },\\\\n  \\\"ending\\\": \\\"Final shot description – what is seen or felt at the end (freeze frame, logo pulse, glow...)\\\",\\\\n  \\\"text\\\": \\\"none | overlay | tagline | logo pulse at end only\\\",\\\\n  \\\"format\\\": \\\"16:9 | 4k | vertical\\\",\\\\n  \\\"keywords\\\": [\\\\n    \\\"brand\\\",\\\\n    \\\"scene style\\\",\\\\n    \\\"motion type\\\",\\\\n    \\\"camera style\\\",\\\\n    \\\"sound mood\\\",\\\\n    \\\"target theme\\\"\\\\n  ]\\\\n}\\\\n\"}], \"temperature\": 0.7, \"max_tokens\": 1400}",
+        "options": {
+          "timeout": 90000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fra8VO4w0TLBP9JO",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "id": "解析脚本JSON",
+      "name": "解析脚本JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; const m=it.choices[0].message.content.match(/\\{[\\s\\S]*\\}/); const o=JSON.parse(m[0]); if(typeof o.title!=='string'||typeof o.final_prompt!=='string') throw new Error('脚本契约失败'); const inner=JSON.parse(o.final_prompt); const carry=$('解析提示词JSON').item.json; const y=$('解析YAML描述').item.json; return [{json:{...carry, IMAGE_DESCRIPTION:y.IMAGE_DESCRIPTION, output:{title:o.title, final_prompt:o.final_prompt}, _outer_ok:true, _inner_ok:Object.keys(inner).length>8}}];"
+      }
+    },
+    {
+      "id": "Format Prompt(模板原样)",
+      "name": "Format Prompt(模板原样)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1380,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json;\nconst structuredPrompt = it.output.final_prompt; // 模板原式 verbatim 计算\nreturn [{json:{...it, prompt: JSON.stringify(structuredPrompt), model: 'veo3_fast', aspectRatio: '16:9'}}];\n"
+      }
+    },
+    {
+      "id": "VEO3替身: ffmpeg成片",
+      "name": "VEO3替身: ffmpeg成片",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const {execSync}=require('child_process'); const it=$input.first().json; execSync('python \\\"C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\scripts\\\\8270-c-render-video.py\\\"'); return [{json:{...it, final_mp4:'C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\8270-c-data\\\\final.mp4'}}];"
+      }
+    },
+    {
+      "id": "记录成片URL(替身)",
+      "name": "记录成片URL(替身)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1820,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const fs=require('fs'); const it=$input.first().json; const vp='C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\8270-c-data\\\\final.mp4'; if(!fs.existsSync(vp)) throw new Error('final.mp4 未生成'); return [{json:{...it, data:{taskId:'local-ff-001', response:{resultUrls:[vp]}}}}];"
+      }
+    },
+    {
+      "id": "DeepSeek: 重写Caption",
+      "name": "DeepSeek: 重写Caption",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2040,
+        0
+      ],
+      "parameters": {
+        "url": "https://api.deepseek.com/v1/chat/completions",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"model\": \"deepseek-chat\", \"messages\": [{\"role\": \"system\", \"content\": \"You are a TikTok caption writer. Follow the user rules strictly, output caption text only.\"}, {\"role\": \"user\", \"content\": \"==You are rewriting a TikTok video script, caption, and overlay —\\nnot inventing a new one. You must follow this format and obey\\nthese rules strictly.\\n---\\n### CONTEXT:\\nHere is the content idea to use:{{ $('测试单').item.json.caption }}\\n\\nand the Title is : {{ $json.output.title }}\\n\\n\\nWrite the caption text using the topic.\\n\\n---\\n- MUST be under 200 characters (yes \\\"Characters\\\" not wordcount)\\nthis is an absolute MUST, no more than 200 characters!!! \\n\\n### FINAL OUTPUT FORMAT (no markdown formatting):\\n\\nDO NOT return any explanations. Only return the Caption Text\\n\"}], \"temperature\": 0.7, \"max_tokens\": 1400}",
+        "options": {
+          "timeout": 90000
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fra8VO4w0TLBP9JO",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "id": "Caption闸门(免费版修复)",
+      "name": "Caption闸门(免费版修复)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2260,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const c=$('记录成片URL(替身)').item.json; const it=$input.first().json; let cap=it.choices[0].message.content.trim().replace(/^[\\\"']|[\\\"']$/g,''); const was=cap.length; if(cap.length>200) cap=cap.slice(0,197)+'...'; return [{json:{...c, caption:cap, caption_raw_len:was, caption_gated:cap.length<=200}}];"
+      }
+    },
+    {
+      "id": "保存台账JSON(Sheets替身)",
+      "name": "保存台账JSON(Sheets替身)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const fs=require('fs'); const p='C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\8270-c-data\\\\records.json'; const it=$input.first().json; const rows=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):[]; rows.push({STATUS:'CREATE', TITRE:it.output.title, CAPTION:it.caption, URL_VIDEO:it.data.response.resultUrls[0], IMAGE:'edited.png'}); fs.writeFileSync(p,JSON.stringify(rows,null,2)); return [{json:{...it, _rows:rows.length}}];"
+      }
+    },
+    {
+      "id": "TG替身: 回发URL",
+      "name": "TG替身: 回发URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2700,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; return [{json:{...it, tg_video_url:it.data.response.resultUrls[0], tg_preview_sent:true}}];"
+      }
+    },
+    {
+      "id": "Blotato替身: 发布队列",
+      "name": "Blotato替身: 发布队列",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2920,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const fs=require('fs'); const p='C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\8270-c-data\\\\publish-queue.json'; const it=$input.first().json; const q=fs.existsSync(p)?JSON.parse(fs.readFileSync(p,'utf8')):[]; q.push({douyin:{queued:true,title:it.output.title,video:it.tg_video_url},bilibili:{queued:true,title:it.output.title,video:it.tg_video_url}}); fs.writeFileSync(p,JSON.stringify(q,null,2)); return [{json:{...it, _queue:q.length}}];"
+      }
+    },
+    {
+      "id": "Update Status DONE",
+      "name": "Update Status DONE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3140,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const fs=require('fs'); const p='C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\8270-c-data\\\\records.json'; const it=$input.first().json; const rows=JSON.parse(fs.readFileSync(p,'utf8')); rows[rows.length-1].STATUS='Published'; fs.writeFileSync(p,JSON.stringify(rows,null,2)); return [{json:{...it, STATUS:'Published'}}];"
+      }
+    },
+    {
+      "id": "ASSERT",
+      "name": "ASSERT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3360,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "\nconst fs=require('fs');\nconst it=$input.first().json; const D='C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\8270-c-data';\nconst checks=[];\nfunction A(n,c){checks.push({name:n, ok:!!c});}\nA('C.场景图工件存在 edited.png', fs.existsSync(D+'\\\\edited.png'));\nA('C.成片工件存在 final.mp4', fs.existsSync(D+'\\\\final.mp4'));\nA('C.图像分析YAML非空且去围栏', typeof it.IMAGE_DESCRIPTION==='string' && it.IMAGE_DESCRIPTION.length>10 && it.IMAGE_DESCRIPTION.indexOf('```')<0);\nA('C.生图提示词≤130词且非空', typeof it.image_prompt==='string' && it.image_prompt.length>20);\nA('C.脚本外层契约 title+final_prompt', it._outer_ok===true);\nA('C.脚本内层 final_prompt 可二次parse 且>8键', it._inner_ok===true);\nA('C.Format Prompt 双转义 prompt 以引号包覆', it.prompt && it.prompt[0]==='\"');\nA('C.Caption≤200 (修复闸门生效)', it.caption_gated===true);\nA('C.台账CREATE→Published 状态机闭环', it.STATUS==='Published' && JSON.parse(fs.readFileSync(D+'\\\\records.json','utf8')).pop().STATUS==='Published');\nA('C.发布队列 douyin+bilibili 已入队', JSON.parse(fs.readFileSync(D+'\\\\publish-queue.json','utf8')).length>=1);\nreturn [{json:{ok: checks.every(c=>c.ok), checks: checks}}];\n"
+      }
+    }
+  ],
+  "connections": {
+    "启动": {
+      "main": [
+        [
+          {
+            "node": "测试单",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "测试单": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek: 图像分析(替身)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek: 图像分析(替身)": {
+      "main": [
+        [
+          {
+            "node": "解析YAML描述",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析YAML描述": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek: UGC生图提示词",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek: UGC生图提示词": {
+      "main": [
+        [
+          {
+            "node": "解析提示词JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析提示词JSON": {
+      "main": [
+        [
+          {
+            "node": "NanoBanana替身: 本地合成场景图",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NanoBanana替身: 本地合成场景图": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek: 生成VEO3脚本",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek: 生成VEO3脚本": {
+      "main": [
+        [
+          {
+            "node": "解析脚本JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "解析脚本JSON": {
+      "main": [
+        [
+          {
+            "node": "Format Prompt(模板原样)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Prompt(模板原样)": {
+      "main": [
+        [
+          {
+            "node": "VEO3替身: ffmpeg成片",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VEO3替身: ffmpeg成片": {
+      "main": [
+        [
+          {
+            "node": "记录成片URL(替身)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "记录成片URL(替身)": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek: 重写Caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek: 重写Caption": {
+      "main": [
+        [
+          {
+            "node": "Caption闸门(免费版修复)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Caption闸门(免费版修复)": {
+      "main": [
+        [
+          {
+            "node": "保存台账JSON(Sheets替身)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "保存台账JSON(Sheets替身)": {
+      "main": [
+        [
+          {
+            "node": "TG替身: 回发URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TG替身: 回发URL": {
+      "main": [
+        [
+          {
+            "node": "Blotato替身: 发布队列",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blotato替身: 发布队列": {
+      "main": [
+        [
+          {
+            "node": "Update Status DONE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status DONE": {
+      "main": [
+        [
+          {
+            "node": "ASSERT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}
