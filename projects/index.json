@@ -6,6 +6,7 @@
       "slug": "generate-and-publish-social-posts-with-gemini-ki",
       "dir": "projects/8965-generate-and-publish-social-posts-with-gemini-ki",
       "name": "Generate and publish social posts with Gemini, Kie.ai, and Zernio API",
+      "nameZh": "用 Gemini+Kie.ai+Zernio 自动生成并发布社媒帖子",
       "status": "backlog",
       "mode": "A",
       "selectedAt": "2026/9/8 06:10:19"
@@ -15,6 +16,7 @@
       "slug": "triage-telegram-voice-and-text-support-with-groq",
       "dir": "projects/17522-triage-telegram-voice-and-text-support-with-groq",
       "name": "Triage Telegram voice and text support with Groq LLMs and Google Sheets",
+      "nameZh": "用 Groq 大模型+Google 表格分流处理 Telegram 语音/文字客服",
       "status": "research",
       "mode": "B",
       "site": "https://xinchun575924529.github.io/n8n-lesson-02-telegram-support-agent/",
@@ -26,6 +28,7 @@
       "slug": "generate-ai-viral-videos-with-nanobanana-veo3-sh",
       "dir": "projects/8270-generate-ai-viral-videos-with-nanobanana-veo3-sh",
       "name": "Generate AI viral videos with NanoBanana & VEO3, shared on socials via Blotato",
+      "nameZh": "用 NanoBanana+VEO3 生成 AI 爆款视频，经 Blotato 分发社媒",
       "status": "research",
       "mode": "B",
       "selectedAt": "2026/9/9 20:08:43"
