@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-09 20:12:31",
+  "updatedAt": "2026-09-10 09:11:27",
   "projects": [
     {
       "id": 8965,
@@ -17,6 +17,8 @@
       "name": "Triage Telegram voice and text support with Groq LLMs and Google Sheets",
       "status": "research",
       "mode": "B",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-02-telegram-support-agent/",
+      "repo": "n8n-lesson-02-telegram-support-agent",
       "selectedAt": "2026/9/8 12:21:37"
     },
     {
