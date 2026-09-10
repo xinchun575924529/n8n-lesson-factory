@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-11 05:27:25",
+  "updatedAt": "2026-09-11 05:37:22",
   "projects": [
     {
       "id": 8965,
@@ -44,6 +44,16 @@
       "mode": "B",
       "selectedAt": "2026/9/11 05:17:16",
       "nameZh": "全自动AI视频生成与多平台发布"
+    },
+    {
+      "id": 10000,
+      "slug": "auto-create-tiktok-videos-with-veed-io-ai-avatar",
+      "dir": "projects/10000-auto-create-tiktok-videos-with-veed-io-ai-avatar",
+      "name": "Auto-create TikTok videos with VEED.io AI avatars, ElevenLabs & GPT-4",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/11 05:29:13",
+      "nameZh": "用VEED.io AI头像、ElevenLabs和GPT-4自动创建TikTok视频"
     }
   ]
 }
