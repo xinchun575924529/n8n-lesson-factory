@@ -1,0 +1,39 @@
+{
+  "id": 3442,
+  "slug": "fully-automated-ai-video-generation-multi-platfo",
+  "dir": "projects/3442-fully-automated-ai-video-generation-multi-platfo",
+  "name": "Fully automated AI video generation & multi-platform publishing",
+  "url": "https://n8n.io/workflows/3442/",
+  "views": 382501,
+  "recent": 15,
+  "nodeCount": 14,
+  "nodeTypes": [
+    "googleSheets",
+    "httpRequest",
+    "if",
+    "merge",
+    "readBinaryFile",
+    "set",
+    "writeBinaryFile",
+    "googleDrive"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/9/11 05:17:16",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/9/11 05:17:16",
+  "updatedAt": "2026/9/11 05:17:16",
+  "history": [
+    {
+      "at": "2026/9/11 05:17:16",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/3442-fully-automated-ai-video-generation-multi-platfo"
+  },
+  "nameZh": "全自动AI视频生成与多平台发布"
+}
