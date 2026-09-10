@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-10 11:39:38",
+  "updatedAt": "2026-09-11 05:27:25",
   "projects": [
     {
       "id": 8965,
@@ -34,6 +34,16 @@
       "selectedAt": "2026/9/9 20:08:43",
       "site": "https://xinchun575924529.github.io/n8n-lesson-03-nanobanana-veo3-video-agent/",
       "repo": "n8n-lesson-03-nanobanana-veo3-video-agent"
+    },
+    {
+      "id": 3442,
+      "slug": "fully-automated-ai-video-generation-multi-platfo",
+      "dir": "projects/3442-fully-automated-ai-video-generation-multi-platfo",
+      "name": "Fully automated AI video generation & multi-platform publishing",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/11 05:17:16",
+      "nameZh": "全自动AI视频生成与多平台发布"
     }
   ]
 }
