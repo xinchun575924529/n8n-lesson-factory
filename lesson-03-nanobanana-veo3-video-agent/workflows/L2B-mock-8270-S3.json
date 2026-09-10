@@ -1,0 +1,989 @@
+{
+  "name": "L2Mock8270-S3",
+  "nodes": [
+    {
+      "id": "n-trigger",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -752
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "n-scen",
+      "name": "SCENARIO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -330,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "return [{json:{scenario:\"S3\", photos:3, caption:\"3档小图测试\", veo_url:\"https://cdn.kie.ai/v/veo3-s3.mp4\", caption_len:60, output:{image_prompt:\"\"}, images:[], data:{} }}];\n"
+      }
+    },
+    {
+      "id": "mock-Telegram: Get Image File",
+      "name": "Telegram: Get Image File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -880
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\n\nif(it.photos<3){return [{json:{...it, __err:{node:\"Telegram: Get Image File\",reason:\"photo[2] undefined (3档图以下无从取分辨率)\",fatal:true}}}];}\nreturn [{json:{...it, file_id:\"mock_file_\"+it.photos, got_from:\"photo[2]\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Google Drive: Upload Image",
+      "name": "Google Drive: Upload Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -688
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, webContentLink:\"https://drive.mock/dl/img_\"+it.scenario+\".png\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Google Sheets: Log Image & Caption",
+      "name": "Google Sheets: Log Image & Caption",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -512
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, \"IMAGE URL\":\"https://drive.mock/dl/img_\"+it.scenario+\".png\", CAPTION: it.caption}}];\n"
+      }
+    },
+    {
+      "id": "mock-Set: Bot Token (Placeholder)",
+      "name": "Set: Bot Token (Placeholder)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, YOUR_BOT_TOKEN:\"mock-bot-token\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Telegram API: Get File URL",
+      "name": "Telegram API: Get File URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\n\nif(it.photos<4){return [{json:{...it, __err:{node:\"Telegram API: Get File URL\",reason:\"photo[3] undefined —— 与 Get Image File 的 photo[2] 档位不一致,3档图断链\",fatal:true}}}];}\nreturn [{json:{...it, file_url:\"https://api.telegram.org/file/botmock-bot-token/photos/f3.jpg\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-OpenAI Vision: Analyze Reference Image",
+      "name": "OpenAI Vision: Analyze Reference Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, visionYaml:\"brand_name: MockBrand\\ncolor_scheme: []\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Google Sheets: Update Image Description",
+      "name": "Google Sheets: Update Image Description",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, \"IMAGE DESCRIPTION\":\"一罐银色能量饮料在健身房地板上,手持自然抓拍\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Generate Image Prompt",
+      "name": "Generate Image Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, output:{image_prompt:\"handheld snapshot of a silver energy drink can on gym floor, natural indoor light, slight motion blur, unpolished look\"}}}];\n"
+      }
+    },
+    {
+      "id": "mock-NanoBanana: Create Image",
+      "name": "NanoBanana: Create Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, response_url:\"https://queue.fal.run/mock/req_\"+it.scenario, _nano_body_ok:true}}];\n"
+      }
+    },
+    {
+      "id": "mock-Wait for Image Edit",
+      "name": "Wait for Image Edit",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        -752
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, waited:\"20s(fixed)\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Download Edited Image",
+      "name": "Download Edited Image",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        -528
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, images:[{url:\"https://cdn.fal.mock/edited_\"+it.scenario+\".png\"}]}}];\n"
+      }
+    },
+    {
+      "id": "mock-Google Sheets: Read Video Parameters (CONFIG)",
+      "name": "Google Sheets: Read Video Parameters (CONFIG)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -192
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, model:\"veo3_fast\", aspectRatio:\"16:9\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Set Master Prompt",
+      "name": "Set Master Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -192
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, json_master: \"{\\n  \\\"description\\\": \\\"Brief narrative description of the scene, focusing on key visual storytelling and product transformation.\\\",\\n  \\\"style\\\": \\\"cinematic | photorealistic | stylized | gritty | elegant\\\",\\n  \\\"camera\\\": {\\n    \\\"type\\\": \\\"fixed | dolly | Steadicam | crane combo\\\",\\n    \\\"movement\\\": \\\"describe any camera moves like slow push-in, pan, orbit\\\",\\n    \\\"lens\\\": \\\"optional lens type or focal length for cinematic effect\\\"\\n  },\\n  \\\"lighting\\\": {\\n    \\\"type\\\": \\\"natural | dramatic | high-contrast\\\",\\n    \\\"sources\\\": \\\"key lighting sources (sunset, halogen, ambient glow...)\\\",\\n    \\\"FX\\\": \\\"optional VFX elements like fog, reflections, flares\\\"\\n  },\\n  \\\"environment\\\": {\\n    \\\"location\\\": \\\"describe location or room (kitchen, desert, basketball court...)\\\",\\n    \\\"set_pieces\\\": [\\n      \\\"list of key background or prop elements\\\",\\n      \\\"e.g. hardwood floors, chain-link fence, velvet surface\\\"\\n    ],\\n    \\\"mood\\\": \\\"describe the ambient atmosphere (moody, clean, epic...)\\\"\\n  },\\n  \\\"elements\\\": [\\n    \\\"main physical items involved (product box, accessories, vehicles...)\\\",\\n    \\\"include brand visibility (logos, packaging, texture...)\\\"\\n  ],\\n  \\\"subject\\\": {\\n    \\\"character\\\": {\\n      \\\"description\\\": \\\"optional \\u2013 physical description, outfit\\\",\\n      \\\"pose\\\": \\\"optional \\u2013 position or gesture\\\",\\n      \\\"lip_sync_line\\\": \\\"optional \\u2013 spoken line if there\\u2019s a voiceover\\\"\\n    },\\n    \\\"product\\\": {\\n      \\\"brand\\\": \\\"Brand name\\\",\\n      \\\"model\\\": \\\"Product model or name\\\",\\n      \\\"action\\\": \\\"description of product transformation or assembly\\\"\\n    }\\n  },\\n  \\\"motion\\\": {\\n    \\\"type\\\": \\\"e.g. transformation, explosion, vortex\\\",\\n    \\\"details\\\": \\\"step-by-step visual flow of how elements move or evolve\\\"\\n  },\\n  \\\"VFX\\\": {\\n    \\\"transformation\\\": \\\"optional \\u2013 describe style (neon trails, motion blur...)\\\",\\n    \\\"impact\\\": \\\"optional \\u2013 e.g. shockwave, glow, distortion\\\",\\n    \\\"particles\\\": \\\"optional \\u2013 embers, sparks, thread strands...\\\",\\n    \\\"environment\\\": \\\"optional \\u2013 VFX affecting the scene (ripples, wind...)\\\"\\n  },\\n  \\\"audio\\\": {\\n    \\\"music\\\": \\\"optional \\u2013 cinematic score, trap beat, ambient tone\\\",\\n    \\\"sfx\\\": [\\n      \\\"list of sound effects (zip, pop, woosh...)\\\"\\n    ],\\n    \\\"ambience\\\": \\\"optional \\u2013 background soundscape (traffic, wind...)\\\",\\n    \\\"voiceover\\\": {\\n      \\\"delivery\\\": \\\"tone and style (confident, whisper, deep...)\\\",\\n      \\\"line\\\": \\\"text spoken if applicable\\\"\\n    }\\n  },\\n  \\\"ending\\\": \\\"Final shot description \\u2013 what is seen or felt at the end (freeze frame, logo pulse, glow...)\\\",\\n  \\\"text\\\": \\\"none | overlay | tagline | logo pulse at end only\\\",\\n  \\\"format\\\": \\\"16:9 | 4k | vertical\\\",\\n  \\\"keywords\\\": [\\n    \\\"brand\\\",\\n    \\\"scene style\\\",\\n    \\\"motion type\\\",\\n    \\\"camera style\\\",\\n    \\\"sound mood\\\",\\n    \\\"target theme\\\"\\n  ]\\n}\\n\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-AI Agent: Generate Video Script",
+      "name": "AI Agent: Generate Video Script",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -192
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, output:{title:\"Gym Morning Energy\", final_prompt: JSON.stringify({description:\"UGC gym energy drink transformation\", format:\"16:9\"})}}}];\n"
+      }
+    },
+    {
+      "id": "mock-Format Prompt",
+      "name": "Format Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        16
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nconst structuredPrompt = $input.first().json.output.final_prompt;\nreturn [{json:{...it, prompt: JSON.stringify(structuredPrompt), model: \"veo3_fast\", aspectRatio: \"16:9\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Generate Video with VEO3",
+      "name": "Generate Video with VEO3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\n\n// 忠实复刻 body 注入: \"prompt\": {{$json.prompt}} 无引号,靠 stringify 外层引号\nconst body = '{\\n  \"prompt\": ' + it.prompt + ',\\n  \"model\": \"' + it.model + '\",\\n  \"aspectRatio\": \"' + it.aspectRatio + '\",\\n  \"imageUrls\": [\"' + (it.images&&it.images[0]?it.images[0].url:'') + '\"]\\n}';\nlet parsed=null, injOK=true; try{ parsed=JSON.parse(body); }catch(e){ injOK=false; }\nreturn [{json:{...it, data:{taskId:\"mock-task-\"+it.scenario}, _veo_body_ok:injOK}}];\n"
+      }
+    },
+    {
+      "id": "mock-Wait for VEO3 Rendering",
+      "name": "Wait for VEO3 Rendering",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, waited:\"20s(fixed,模板仅此一次轮询)\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Download Video from VEO3",
+      "name": "Download Video from VEO3",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\n\nif(it.veo_url){ return [{json:{...it, data:{taskId:it.data.taskId, response:{resultUrls:[it.veo_url]}}}}]; }\nreturn [{json:{...it, data:{taskId:it.data.taskId}}}];  // 渲染未完成: 无 response\n"
+      }
+    },
+    {
+      "id": "mock-Rewrite Caption with GPT-4o",
+      "name": "Rewrite Caption with GPT-4o",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\n\nreturn [{json:{...it, message:{content:\"x\".repeat(it.caption_len)}}}];\n"
+      }
+    },
+    {
+      "id": "mock-Save Caption Video to Google Sheets",
+      "name": "Save Caption Video to Google Sheets",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\n\nconst cap=(it.message&&it.message.content)||'';\nreturn [{json:{...it, STATUS:\"CREATE\", \"TITRE VIDEO\": (it.output&&it.output.title)||\"?\", \"CAPTION VIDEO\": cap, \"URL VIDEO FINAL\": (it.data&&it.data.response&&it.data.response.resultUrls)?it.data.response.resultUrls[0]:undefined, caption_too_long: cap.length>200}}];\n"
+      }
+    },
+    {
+      "id": "mock-Send Video URL via Telegram",
+      "name": "Send Video URL via Telegram",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        -176
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json;\nif(it && it.__err){return [{json:it}];}  // 上游已断,忠实中止\ntry{\n  const ref = $(\"Download Video from VEO3\").item.json;\n  const url = ref.data.response.resultUrls[0];\n  return [{json:{...it, tg_video_url:url}}];\n}catch(e){\n  return [{json:{...it, __err:{node:\"Send Video URL via Telegram\",reason:\"读 record-info 的 data.response.resultUrls[0] 抛错(渲染未完成即断链,无错误网): \"+e.message,fatal:true}}}];\n}\n"
+      }
+    },
+    {
+      "id": "mock-Send Final Video Preview",
+      "name": "Send Final Video Preview",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        64
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, preview_sent:true}}];\n"
+      }
+    },
+    {
+      "id": "mock-Upload Video to BLOTATO",
+      "name": "Upload Video to BLOTATO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, url:\"https://blotato.mock/media/\"+it.scenario}}];\n"
+      }
+    },
+    {
+      "id": "mock-Youtube",
+      "name": "Youtube",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        112
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Youtube\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Tiktok",
+      "name": "Tiktok",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        -64
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Tiktok\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Linkedin",
+      "name": "Linkedin",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -64
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Linkedin\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Facebook",
+      "name": "Facebook",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -64
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Facebook\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Instagram",
+      "name": "Instagram",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        112
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Instagram\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Threads",
+      "name": "Threads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Threads\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Bluesky",
+      "name": "Bluesky",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Bluesky\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Pinterest",
+      "name": "Pinterest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Pinterest\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Twitter (X)",
+      "name": "Twitter (X)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        112
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, posted:true, platform:\"Twitter (X)\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Merge",
+      "name": "Merge",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        16
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const all=$input.all();\nconst first=all.find(x=>x.json && !x.json.__err);\nif(first){return [{json:{...first.json, merged_from_9:true}}];}\nreturn [{json:all[0].json}];\n"
+      }
+    },
+    {
+      "id": "mock-Update Status to \"DONE\"",
+      "name": "Update Status to \"DONE\"",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        128
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, STATUS:\"Published\", matching:\"IMAGE NAME\"}}];\n"
+      }
+    },
+    {
+      "id": "mock-Telegram: Send notification",
+      "name": "Telegram: Send notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        336
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const it=$input.first().json; if(it && it.__err){return [{json:it}];}\nreturn [{json:{...it, notified:true}}];\n"
+      }
+    },
+    {
+      "id": "mock-ASSERT",
+      "name": "ASSERT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2500,
+        320
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const all=$input.all();\nconst it=all[0].json; const S=it.scenario; const checks=[];\nfunction A(n,c){checks.push({name:n, ok:!!c});}\nA(\"B-\"+S+\".场景上下文贯通(S=\"+S+\" 非undefined)\", typeof S===\"string\" && S.length===2);\nA(\"B-\"+S+\".items: 右链行数=\"+all.length+\" (模板 SCENARIO 双出真正含义见报告)\", all.length>=1);\nif(S===\"S1\"){ A(\"B-S1.终态Published\", !it.__err && it.STATUS===\"Published\"); A(\"B-S1.VEO3 body注入合法\", it._veo_body_ok===true); A(\"B-S1.成片URL已回TG\", typeof it.tg_video_url===\"string\" && it.tg_video_url.indexOf(\".mp4\")>-1); A(\"B-S1.状态机CREATE→Published\", it.STATUS===\"Published\"); }\nif(S===\"S2\"){ A(\"B-S2.无caption仍通链(服务端降级由LLM自担)\", !it.__err && it.STATUS===\"Published\"); }\nif(S===\"S3\"){ A(\"B-S3.坑①引爆: photo[3]断链且非photo[2]节点\", !!it.__err && it.__err.node===\"Telegram API: Get File URL\"); }\nif(S===\"S4\"){ A(\"B-S4.坑②引爆: 渲染未完成→首消费点Send Video URL断链\", !!it.__err && it.__err.node===\"Send Video URL via Telegram\"); }\nif(S===\"S5\"){ A(\"B-S5.Caption超长仍直写Sheets(模板无200符闸)\", it.caption_too_long===true && !it.__err); }\nreturn [{json:{scenario:S, checks:checks, ok: checks.every(c=>c.ok)}}];\n"
+      }
+    }
+  ],
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update Status to \"DONE\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tiktok": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bluesky": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Youtube": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Linkedin": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinterest": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter (X)": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Video with VEO3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Master Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: Generate Video Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Image Edit": {
+      "main": [
+        [
+          {
+            "node": "Download Edited Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Edited Image": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets: Read Video Parameters (CONFIG)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image Prompt": {
+      "main": [
+        [
+          {
+            "node": "NanoBanana: Create Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status to \"DONE\"": {
+      "main": [
+        [
+          {
+            "node": "Telegram: Send notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Video to BLOTATO": {
+      "main": [
+        [
+          {
+            "node": "Tiktok",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Linkedin",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Facebook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Instagram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter (X)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Youtube",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Threads",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bluesky",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Pinterest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for VEO3 Rendering": {
+      "main": [
+        [
+          {
+            "node": "Download Video from VEO3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video from VEO3": {
+      "main": [
+        [
+          {
+            "node": "Rewrite Caption with GPT-4o",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Video with VEO3": {
+      "main": [
+        [
+          {
+            "node": "Wait for VEO3 Rendering",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NanoBanana: Create Image": {
+      "main": [
+        [
+          {
+            "node": "Wait for Image Edit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Final Video Preview": {
+      "main": [
+        [
+          {
+            "node": "Upload Video to BLOTATO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Get Image File": {
+      "main": [
+        [
+          {
+            "node": "Google Drive: Upload Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive: Upload Image": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets: Log Image & Caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram API: Get File URL": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Vision: Analyze Reference Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rewrite Caption with GPT-4o": {
+      "main": [
+        [
+          {
+            "node": "Save Caption Video to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Video URL via Telegram": {
+      "main": [
+        [
+          {
+            "node": "Send Final Video Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Bot Token (Placeholder)": {
+      "main": [
+        [
+          {
+            "node": "Telegram API: Get File URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent: Generate Video Script": {
+      "main": [
+        [
+          {
+            "node": "Format Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets: Log Image & Caption": {
+      "main": [
+        [
+          {
+            "node": "Set: Bot Token (Placeholder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Caption Video to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Video URL via Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SCENARIO": {
+      "main": [
+        [
+          {
+            "node": "Set: Bot Token (Placeholder)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram: Get Image File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Vision: Analyze Reference Image": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets: Update Image Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets: Update Image Description": {
+      "main": [
+        [
+          {
+            "node": "Generate Image Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets: Read Video Parameters (CONFIG)": {
+      "main": [
+        [
+          {
+            "node": "Set Master Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "SCENARIO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram: Send notification": {
+      "main": [
+        [
+          {
+            "node": "ASSERT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {}
+}
