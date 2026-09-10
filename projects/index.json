@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-10 09:11:27",
+  "updatedAt": "2026-09-10 11:39:38",
   "projects": [
     {
       "id": 8965,
@@ -31,7 +31,9 @@
       "nameZh": "用 NanoBanana+VEO3 生成 AI 爆款视频，经 Blotato 分发社媒",
       "status": "research",
       "mode": "B",
-      "selectedAt": "2026/9/9 20:08:43"
+      "selectedAt": "2026/9/9 20:08:43",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-03-nanobanana-veo3-video-agent/",
+      "repo": "n8n-lesson-03-nanobanana-veo3-video-agent"
     }
   ]
 }
