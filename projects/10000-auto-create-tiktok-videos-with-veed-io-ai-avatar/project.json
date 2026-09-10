@@ -1,0 +1,39 @@
+{
+  "id": 10000,
+  "slug": "auto-create-tiktok-videos-with-veed-io-ai-avatar",
+  "dir": "projects/10000-auto-create-tiktok-videos-with-veed-io-ai-avatar",
+  "name": "Auto-create TikTok videos with VEED.io AI avatars, ElevenLabs & GPT-4",
+  "url": "https://n8n.io/workflows/10000/",
+  "views": 115196,
+  "recent": 13,
+  "nodeCount": 11,
+  "nodeTypes": [
+    "googleSheets",
+    "httpRequest",
+    "merge",
+    "set",
+    "telegram",
+    "telegramTrigger",
+    "wait",
+    "stickyNote"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/9/11 05:29:13",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/9/11 05:29:13",
+  "updatedAt": "2026/9/11 05:29:13",
+  "history": [
+    {
+      "at": "2026/9/11 05:29:13",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/10000-auto-create-tiktok-videos-with-veed-io-ai-avatar"
+  },
+  "nameZh": "用VEED.io AI头像、ElevenLabs和GPT-4自动创建TikTok视频"
+}
