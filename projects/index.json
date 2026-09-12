@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-11 05:37:22",
+  "updatedAt": "2026-09-12 14:20:28",
   "projects": [
     {
       "id": 8965,
@@ -54,6 +54,16 @@
       "mode": "B",
       "selectedAt": "2026/9/11 05:29:13",
       "nameZh": "用VEED.io AI头像、ElevenLabs和GPT-4自动创建TikTok视频"
+    },
+    {
+      "id": 2462,
+      "slug": "angie-personal-ai-assistant-with-telegram-voice",
+      "dir": "projects/2462-angie-personal-ai-assistant-with-telegram-voice",
+      "name": "Angie, personal AI assistant with Telegram voice and text",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/12 13:45:20",
+      "nameZh": "Angie，Telegram语音和文本个人AI助手"
     }
   ]
 }
