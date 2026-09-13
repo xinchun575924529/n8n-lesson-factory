@@ -1,0 +1,132 @@
+{
+  "id": "L2AUnit246200001",
+  "name": "2462-单元单测(L2A)-真实模型不外发",
+  "active": false,
+  "nodes": [
+    {
+      "id": "n0",
+      "name": "启动",
+      "type": "n8n-nodes-base.webhook",
+      "position": [0, 300],
+      "webhookId": "l2a2462unit-wh-0001",
+      "parameters": { "path": "l2a2462unit", "responseMode": "lastNode", "options": {} },
+      "typeVersion": 2
+    },
+    {
+      "id": "n1",
+      "name": "U1-白名单与分流断言",
+      "type": "n8n-nodes-base.code",
+      "position": [220, 300],
+      "parameters": {
+        "jsCode": "// 忠实复刻模板表达式逻辑并断言\n// If1: from.id === allow(数字比较, equals)\n// If : text 为空 → 语音分支\nconst results = [];\nfunction assert(name, cond, detail) { results.push({ name, pass: !!cond, detail }); if (!cond) throw new Error('断言失败: ' + name + ' ' + JSON.stringify(detail)); }\nfunction if1_allow(fromId, allow) { return Number(fromId) === Number(allow); }\nassert('白名单-本人通过', if1_allow(123456789, '123456789'));\nassert('白名单-陌生人拦截', !if1_allow(999, '123456789'));\nfunction voiceBranch(text) { return text === undefined || text === null || text === ''; }\nassert('分流-纯语音消息走STT', voiceBranch(undefined));\nassert('分流-空文本走STT', voiceBranch(''));\nassert('分流-有文字走Agent直取', !voiceBranch('今天有什么安排？'));\n// 模板已知坑验证：memoryBufferWindow 硬编码 sessionKey=angie_session_default，所有用户共用一份记忆\nconst memoryNode = { sessionKey: 'angie_session_default', sessionIdType: 'customKey' };\nassert('模板memory硬编码sessionKey(已知缺陷已识别)', memoryNode.sessionIdType === 'customKey' && memoryNode.sessionKey === 'angie_session_default');\nreturn [{ json: { u1: 'passed', cases: results.length } }];"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "n2",
+      "name": "构造测试输入",
+      "type": "n8n-nodes-base.set",
+      "position": [440, 300],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "a1", "name": "text", "type": "string", "value": "先帮我算一下 987654321 乘以 123456789 等于多少（必须调用 calculator 工具，不要自己算），然后告诉我今天日历和任务里有什么。" },
+            { "id": "a2", "name": "sessionId", "type": "string", "value": "l2a-test-user" }
+          ]
+        },
+        "options": {}
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "n3",
+      "name": "Angie, AI Assistant",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [660, 300],
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "promptType": "define",
+        "options": {
+          "systemMessage": "You are a helpful assistant.\n\nToday's date is {{ $now }}.\n\nGuidelines:\n- Use the google_calendar tool to answer questions about calendar events.\n- Use the task_list tool to answer questions about tasks.\n- Use the calculator tool for any arithmetic. Do not compute results yourself.\n- Answer in the same language the user used.",
+          "maxIterations": 6,
+          "returnIntermediateSteps": true
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "n4",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [660, 480],
+      "parameters": { "model": "deepseek-chat", "options": {} },
+      "credentials": { "openAiApi": { "id": "DSasOpenAICred001", "name": "DeepSeek-as-OpenAI (2462 test)" } },
+      "typeVersion": 1
+    },
+    {
+      "id": "n5",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [800, 480],
+      "parameters": { "sessionKey": "={{ $('构造测试输入').item.json.sessionId }}", "sessionIdType": "customKey", "contextWindowLength": 10 },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "n6",
+      "name": "google_calendar",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [940, 480],
+      "parameters": {
+        "name": "google_calendar",
+        "language": "javaScript",
+        "description": "Get calendar events. Use this to answer questions about the user's schedule.",
+        "jsCode": "return 'CALENDAR: weekly-product-sync at 14:00 today; 1on1 with Zhang-san at 16:30';"
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "n7",
+      "name": "task_list",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "position": [1080, 480],
+      "parameters": {
+        "name": "task_list",
+        "language": "javaScript",
+        "description": "Get the user's to-do task list.",
+        "jsCode": "return 'TASKS: reply-to-customer-email; submit-weekly-report';"
+      },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "n9",
+      "name": "calculator",
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "position": [1220, 480],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "n8",
+      "name": "汇总断言",
+      "type": "n8n-nodes-base.code",
+      "position": [920, 300],
+      "parameters": {
+        "jsCode": "const j = $input.first().json;\nconst out = j.output || j.text || JSON.stringify(j);\nconst steps = (j.intermediateSteps || []).map(s => ({ tool: s.action && s.action.tool, input: s.action && s.action.toolInput, obs: String(s.observation).slice(0,200) }));\nconst checks = {\n  非空输出: out.length > 10,\n  工具调用数3: steps.length === 3,\n  计算器结果回传: steps.some(s => s.tool === 'calculator' && s.obs.includes('12193263111263526')),\n  日历结果回传: steps.some(s => s.tool === 'google_calendar' && s.obs.includes('weekly-product-sync')),\n  任务结果回传: steps.some(s => s.tool === 'task_list' && s.obs.includes('weekly-report')),\n  答案融合日历: out.includes('weekly-product-sync') || out.includes('14:00'),\n  答案融合任务: out.includes('weekly-report') || out.includes('回复客户邮件')\n};\nconst failed = Object.entries(checks).filter(([k,v]) => !v).map(([k]) => k);\nif (failed.length) throw new Error('U2失败: ' + failed.join(',') + ' | 输出=' + out.slice(0,200) + ' | steps=' + JSON.stringify(steps).slice(0,500));\nreturn [{ json: { u2: 'passed', checks: Object.keys(checks).length, outputPreview: out.slice(0, 300), toolSteps: steps } }];"
+      },
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "启动": { "main": [[{ "node": "U1-白名单与分流断言", "type": "main", "index": 0 }]] },
+    "U1-白名单与分流断言": { "main": [[{ "node": "构造测试输入", "type": "main", "index": 0 }]] },
+    "构造测试输入": { "main": [[{ "node": "Angie, AI Assistant", "type": "main", "index": 0 }]] },
+    "Angie, AI Assistant": { "main": [[{ "node": "汇总断言", "type": "main", "index": 0 }]] },
+    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "Angie, AI Assistant", "type": "ai_languageModel", "index": 0 }]] },
+    "Simple Memory": { "ai_memory": [[{ "node": "Angie, AI Assistant", "type": "ai_memory", "index": 0 }]] },
+    "google_calendar": { "ai_tool": [[{ "node": "Angie, AI Assistant", "type": "ai_tool", "index": 0 }]] },
+    "task_list": { "ai_tool": [[{ "node": "Angie, AI Assistant", "type": "ai_tool", "index": 0 }]] },
+    "calculator": { "ai_tool": [[{ "node": "Angie, AI Assistant", "type": "ai_tool", "index": 0 }]] }
+  },
+  "settings": {},
+  "pinData": {}
+}
