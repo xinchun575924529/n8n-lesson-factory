@@ -1,0 +1,39 @@
+{
+  "id": 16419,
+  "slug": "generate-youtube-shorts-from-prompts-with-openai",
+  "dir": "projects/16419-generate-youtube-shorts-from-prompts-with-openai",
+  "name": "Generate YouTube shorts from prompts with OpenAI, ElevenLabs and Pexels",
+  "url": "https://n8n.io/workflows/16419/",
+  "views": 2764,
+  "recent": 9,
+  "nodeCount": 12,
+  "nodeTypes": [
+    "httpRequest",
+    "if",
+    "merge",
+    "set",
+    "ftp",
+    "youTube",
+    "wait",
+    "stickyNote"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/9/13 14:59:41",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/9/13 14:59:41",
+  "updatedAt": "2026/9/13 14:59:41",
+  "history": [
+    {
+      "at": "2026/9/13 14:59:41",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/16419-generate-youtube-shorts-from-prompts-with-openai"
+  },
+  "nameZh": "用OpenAI、ElevenLabs和Pexels根据提示生成YouTube短片"
+}
