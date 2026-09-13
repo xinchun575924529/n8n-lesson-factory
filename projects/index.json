@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-12 14:20:28",
+  "updatedAt": "2026-09-13 15:13:43",
   "projects": [
     {
       "id": 8965,
@@ -64,6 +64,16 @@
       "mode": "B",
       "selectedAt": "2026/9/12 13:45:20",
       "nameZh": "Angie，Telegram语音和文本个人AI助手"
+    },
+    {
+      "id": 16419,
+      "slug": "generate-youtube-shorts-from-prompts-with-openai",
+      "dir": "projects/16419-generate-youtube-shorts-from-prompts-with-openai",
+      "name": "Generate YouTube shorts from prompts with OpenAI, ElevenLabs and Pexels",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/13 14:59:41",
+      "nameZh": "用OpenAI、ElevenLabs和Pexels根据提示生成YouTube短片"
     }
   ]
 }
