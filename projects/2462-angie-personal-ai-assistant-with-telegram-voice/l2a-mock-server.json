@@ -1,0 +1,31 @@
+{
+  "id": "L2AMock24620001",
+  "name": "2462-L2A-假数据服务(日历+任务)",
+  "active": false,
+  "nodes": [
+    {
+      "id": "m0",
+      "name": "启动",
+      "type": "n8n-nodes-base.webhook",
+      "position": [0, 300],
+      "webhookId": "l2a2462mock-wh-01",
+      "parameters": { "path": "l2a2462mock", "responseMode": "lastNode", "options": {} },
+      "typeVersion": 2
+    },
+    {
+      "id": "m1",
+      "name": "按类型吐假数据",
+      "type": "n8n-nodes-base.code",
+      "position": [240, 300],
+      "parameters": {
+        "jsCode": "const t = $input.first().json.query && $input.first().json.query.t;\nconst data = t === 'cal'\n  ? { events: [{ summary: 'weekly-product-sync', start: '14:00' }, { summary: '1on1-Zhangsan', start: '16:30' }] }\n  : { tasks: [{ title: 'reply-customer-email' }, { title: 'submit-weekly-report' }] };\nreturn [{ json: data }];"
+      },
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "启动": { "main": [[{ "node": "按类型吐假数据", "type": "main", "index": 0 }]] }
+  },
+  "settings": {},
+  "pinData": {}
+}
