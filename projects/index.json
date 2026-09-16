@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-13 15:13:43",
+  "updatedAt": "2026-09-16 20:41:29",
   "projects": [
     {
       "id": 8965,
@@ -74,6 +74,16 @@
       "mode": "B",
       "selectedAt": "2026/9/13 14:59:41",
       "nameZh": "用OpenAI、ElevenLabs和Pexels根据提示生成YouTube短片"
+    },
+    {
+      "id": 18042,
+      "slug": "deliver-digital-products-via-whatsapp-and-telegr",
+      "dir": "projects/18042-deliver-digital-products-via-whatsapp-and-telegr",
+      "name": "Deliver digital products via WhatsApp and Telegram after Stripe payment",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/16 20:29:18",
+      "nameZh": "通过Stripe付款后经WhatsApp和Telegram交付数字产品"
     }
   ]
 }
