@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-16 20:41:29",
+  "updatedAt": "2026-09-17 15:04:11",
   "projects": [
     {
       "id": 8965,
@@ -73,7 +73,8 @@
       "status": "research",
       "mode": "B",
       "selectedAt": "2026/9/13 14:59:41",
-      "nameZh": "用OpenAI、ElevenLabs和Pexels根据提示生成YouTube短片"
+      "nameZh": "用OpenAI、ElevenLabs和Pexels根据提示生成YouTube短片",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-04-youtube-shorts-generator/"
     },
     {
       "id": 18042,
