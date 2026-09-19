@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-17 15:04:11",
+  "updatedAt": "2026-09-19 20:23:49",
   "projects": [
     {
       "id": 8965,
@@ -63,7 +63,9 @@
       "status": "research",
       "mode": "B",
       "selectedAt": "2026/9/12 13:45:20",
-      "nameZh": "Angie，Telegram语音和文本个人AI助手"
+      "nameZh": "Angie，Telegram语音和文本个人AI助手",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-05-angie-telegram-ai-assistant/",
+      "repo": "n8n-lesson-05-angie-telegram-ai-assistant"
     },
     {
       "id": 16419,
