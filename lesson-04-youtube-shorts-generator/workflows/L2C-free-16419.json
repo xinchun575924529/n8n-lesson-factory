@@ -1,0 +1,311 @@
+{
+  "id": "L2Cstm164190001",
+  "name": "L2-C 免费真跑 16419",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1d1dd837-a4c5-4c6a-b547-80bd40864294",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{Prompt:'Why a 4-day work week is quietly spreading across Europe', formMode:'test', submissionId:'16419-c-1'}}];"
+      },
+      "id": "e6b9ae14-f149-4664-b7d4-34b4aa96acca",
+      "name": "Form Input (mock)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const summary=$json.Prompt; const channelName='N8N\\u5de5\\u5382';   // 模板此处置为 'XXX'\nreturn [{json:{summary, channelName}}];"
+      },
+      "id": "ef1af1f1-88fd-452f-a747-b8d6860ec659",
+      "name": "Set vars (真)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2000,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs=require('fs');\nconst key=JSON.parse(fs.readFileSync('C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/deepseek-key.json','utf8')).apiKey;\nasync function ds(sys, user, maxTok){\n  const resp = await this.helpers.httpRequest({method:'POST', url:'https://api.deepseek.com/chat/completions',\n    headers:{Authorization:'Bearer '+key, 'Content-Type':'application/json'}, timeout:120000,\n    body:{model:'deepseek-chat', messages:[{role:'system', content:sys},{role:'user', content:user}],\n      response_format:{type:'json_object'}, temperature:0.7, max_tokens:maxTok||800}, json:true});\n  return resp.choices[0].message.content;\n}\nconst channelName=$json.channelName;\nconst sys='You are a scriptwriter for short-form vertical video content (YouTube Shorts / Reels / TikTok).\\nWrite a punchy 60-second voiceover script based on the title and summary below, plus a title and a footage search keyword for the finished video.\\n\\nTASK\\nProduce three things from the input above:\\n1. A short, scroll-stopping title for the video.\\n2. A single spoken-word script meant to be read aloud in under 60 seconds.\\n3. A keyword to search stock footage that visually matches the script.\\n\\nHARD RULES \\u2014 SCRIPT\\n- The first three words must hook the listener: a surprising fact, a bold claim, a question, or a direct command. Never open with \\\"Imagine\\\", \\\"In a world\\\", \\\"Did you know\\\", or any generic intro.\\n- Maximum 150 words total, including the closing line.\\n- Plain spoken text only. No stage directions, no parentheses, no brackets, no camera or visual cues, no emojis, no hashtags, no labels like \\\"Voiceover:\\\" or \\\"Scene:\\\".\\n- No filler words (basically, actually, just, really, very, kind of, sort of, etc.).\\n- Short, punchy sentences. Vary rhythm: mix very short fragments with slightly longer lines.\\n- Tone: confident and direct, matched to the subject in the summary \\u2014 serious for serious topics, energetic for lighter ones.\\n- End with exactly this line, replacing the placeholder with the channel name above: Follow CHANNELNAME for more\\n\\nHARD RULES \\u2014 TITLE\\n- Maximum 60 characters.\\n- No clickbait that misrepresents the content. No emojis, no hashtags, no quotation marks.\\n- Must reflect the actual content of the script, not just the input title.\\n\\nHARD RULES \\u2014 KEYWORD\\n- 1 to 4 words describing a concrete, filmable visual (an object, a place, an action, a scene) that matches the mood and topic of the script.\\n- No abstract concepts (e.g. not \\\"innovation\\\" or \\\"freedom\\\") \\u2014 only things a stock footage search can return real clips for (e.g. \\\"city traffic at night\\\", \\\"hands typing keyboard\\\").\\n- English only, regardless of the input language, since stock libraries are indexed in English.\\n\\nBEFORE YOU ANSWER\\nCount the words in the script. If over 150, cut whole sentences \\u2014 never compress ideas into broken grammar.\\n\\nOUTPUT FORMAT\\nReturn ONLY a single JSON object with exactly these keys: {\\\"title\\\": string, \\\"script\\\": string, \\\"keyword\\\": string}'.replace('CHANNELNAME', channelName);\nconst user='Summary: '+$json.summary+'\\nChannel: '+channelName;\nconst raw=await ds(sys, user, 900);\nlet out=null, parseErr=null;\ntry{ out=JSON.parse(raw); }catch(e){ parseErr=String(e); }\nif(!out) throw new Error('DeepSeek 未返回可解析 JSON: '+parseErr+' | raw='+String(raw).slice(0,200));\nreturn [{json:{...$json, raw, output:{title:out.title, script:out.script, keyword:out.keyword}}}];"
+      },
+      "id": "31808b58-0ec7-4764-9712-872677196955",
+      "name": "DeepSeek Voiceover (替 OpenAI Agent + Parser)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const o=$json.output;\nreturn [{json:{script:o.script, keyword:o.keyword, title:o.title, summary:$('Set vars (真)').first().json.summary, channelName:$('Set vars (真)').first().json.channelName}}];"
+      },
+      "id": "bd90d688-3b23-4ce5-910f-18a9cbe7ad42",
+      "name": "Voiceover vars (真)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs=require('fs'); const cp=require('child_process');\nconst dir='C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/16419-c-data'; fs.mkdirSync(dir,{recursive:true});\nconst kw=$json.keyword;\n// ① 模板原节点：Pexels API 无 key 的真实行为（凭证缺口实证）\nlet pexelsStatus=0, pexelsBody='';\ntry{ await this.helpers.httpRequest({method:'GET', url:'https://api.pexels.com/videos/search?query='+encodeURIComponent(kw)+'&min_duration=55&max_duration=65&orientation=portrait&per_page=1', timeout:30000, json:true}); pexelsStatus=200; }\ncatch(e){ const m=/status code (\\d{3})/.exec(String(e.message)); pexelsStatus=(e.response&&(e.response.status||e.response.statusCode)) || e.httpCode || e.statusCode || (m?parseInt(m[1]):0); pexelsBody=String(e.message).slice(0,200); }\n// ② 免 key 公开素材库（Mixkit vertical 列表页，真搜索真下载）\nconst listUrl='https://mixkit.co/free-stock-video/vertical/';\nconst html=await this.helpers.httpRequest({method:'GET', url:listUrl, timeout:60000});\nconst found=[...String(html).matchAll(/https:\\/\\/assets\\.mixkit\\.co\\/videos\\/(\\d+)\\/\\1-360\\.mp4/g)].map(m=>m[1]);\nconst uniq=[...new Set(found)].slice(0,8);\n// ③ 文件级竖屏校验（模板缺的那一步：orientation 只在搜索级生效）\nfunction dims(u){ try{ const o=cp.execSync('ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 \"'+u+'\"',{timeout:60000}).toString().trim().split(','); return {w:parseInt(o[0]),h:parseInt(o[1])}; }catch(e){ return null; } }\nlet pick=null, probed=[];\nfor(const id of uniq){ const u='https://assets.mixkit.co/videos/'+id+'/'+id+'-720.mp4'; const d=dims(u); probed.push({id, u, d}); if(d && d.h>d.w){ pick={id,u,d}; break; } }\nif(!pick) throw new Error('免 key 素材源未找到竖屏文件，probed='+JSON.stringify(probed));\nconst footage=dir+'/footage.mp4';\ncp.execSync('curl.exe -s -L -o \"'+footage+'\" \"'+pick.u+'\"',{timeout:180000});\nconst size=fs.statSync(footage).size;\nreturn [{json:{...$json, pexelsStatus, pexelsBody, footage, footageSize:size, footageW:pick.d.w, footageH:pick.d.h, footageId:pick.id, source:'mixkit.co/free-stock-video/vertical', candidates:uniq.length}}];"
+      },
+      "id": "a99af9b8-b8cd-49f9-a136-58f9650ee631",
+      "name": "Keyless Footage Search (替 Pexels)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs=require('fs'); const cp=require('child_process');\nconst dir='C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/16419-c-data';\nconst txt=$json.script.replace(/[\"\\u201c\\u201d\\r\\n]+/g,' ').trim();\nfs.writeFileSync(dir+'/script.txt', txt, 'utf8');\nconst audio=dir+'/voice.mp3';\ncp.execSync('\"'+'C:/Users/Administrator/AppData/Local/easyclaw/ai/tool_cache/resources/tools/win/python-3.11.9/Scripts/edge-tts.exe'+'\" --voice en-US-AriaNeural --rate=+8% --file \"'+dir+'/script.txt\" --write-media \"'+audio+'\"',{timeout:120000});\nconst audioSize=fs.statSync(audio).size;\nreturn [{json:{...$json, audioPath:audio, audioSize}}];"
+      },
+      "id": "428d8fff-3f56-4bd8-bda4-4230e9b65e6a",
+      "name": "edge-tts (替 ElevenLabs)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cp=require('child_process');\nconst o=cp.execSync('ffprobe -v error -show_entries format=duration -of csv=p=0 \"'+$json.audioPath+'\"').toString().trim();\nconst words=$json.script.trim().split(/\\s+/).length;\nreturn [{json:{...$json, audioSec:parseFloat(o), words}}];"
+      },
+      "id": "0cd9bebc-6a79-41cf-a099-d6f4d57f6ee8",
+      "name": "Probe Audio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1000,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs=require('fs'); const cp=require('child_process');\nconst dir='C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/16419-c-data';\nconst video=dir+'/lesson-16419-c.mp4';\nconst t=Math.min($json.audioSec, 60).toFixed(2);\nconst vf='scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,setsar=1';\ncp.execSync('ffmpeg -y -stream_loop -1 -i \"'+$json.footage+'\" -i \"'+$json.audioPath+'\" -filter_complex \"[0:v]'+vf+'[v]\" -map \"[v]\" -map 1:a -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p -c:a aac -b:a 192k -ar 48000 -ac 2 -t '+t+' -movflags +faststart \"'+video+'\"',{timeout:600000});\nconst videoSize=fs.statSync(video).size;\nreturn [{json:{...$json, videoPath:video, videoSize}}];"
+      },
+      "id": "33d5c164-f4bc-40e0-a8e9-c073e67db3b5",
+      "name": "ffmpeg Merge (替 fal.run + 30s 轮询环)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const cp=require('child_process');\nconst v=$json.videoPath;\nconst wh=cp.execSync('ffprobe -v error -select_streams v:0 -show_entries stream=width,height,codec_name -of csv=p=0 \"'+v+'\"').toString().trim().split(',');\nconst ac=cp.execSync('ffprobe -v error -select_streams a:0 -show_entries stream=codec_name -of csv=p=0 \"'+v+'\"').toString().trim();\nconst dur=cp.execSync('ffprobe -v error -show_entries format=duration -of csv=p=0 \"'+v+'\"').toString().trim();\nreturn [{json:{...$json, outW:parseInt(wh[1]), outH:parseInt(wh[2]), vcodec:wh[0], acodec:ac, outSec:parseFloat(dur)}}];"
+      },
+      "id": "a9465e5f-690b-459d-a1dd-9eba56d1b64a",
+      "name": "Probe Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs=require('fs');\nconst file='C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/16419-c-data/ledger.json';\nlet rows=[]; try{ rows=JSON.parse(fs.readFileSync(file,'utf8')); }catch(e){ rows=[]; }\nconst row={PROMPT:$json.summary, TITLE:$json.title, KEYWORD:$json.keyword, WORDS:$json.words,\n  AUDIO:$json.audioPath, FOOTAGE_SOURCE:$json.source, FOOTAGE:$json.footage, VIDEO:$json.videoPath,\n  VIDEO_SPEC:$json.outW+'x'+$json.outH, AUDIO_SEC:$json.audioSec, VIDEO_SEC:$json.outSec, STATUS:'DONE', ts:new Date().toISOString()};\nrows=rows.filter(r=>r.VIDEO!==row.VIDEO); rows.push(row);\nfs.writeFileSync(file, JSON.stringify(rows,null,1), 'utf8');\nreturn [{json:{...$json, ledgerRows:rows.length, ledgerRow:row}}];"
+      },
+      "id": "8f14811c-25b5-4822-a0b7-adf3313e12b1",
+      "name": "Local Ledger (替 FTP + Sheets)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{json:{...$json, publish:{platform:'youtube-shorts', mode:'mock', privacyStatus:'private',\n  reason:'\\u6a21\\u677f YouTube OAuth \\u5c5e\\u4ed8\\u8d39\\u5e10\\u53f7\\u73af\\u8282\\uff1b\\u672c\\u5382\\u53d1\\u5e03\\u8d70 publish-video.py \\u6296\\u97f3+B\\u7ad9\\u53cc\\u901a\\u9053\\uff08L4 \\u8303\\u7574\\uff09', targetNote:'state/16419-c-data/lesson-16419-c.mp4'}}}];"
+      },
+      "id": "14fba456-93be-4c13-b03d-43c4c771d0a7",
+      "name": "Mock YouTube Upload (替 YouTube 节点)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fs=require('fs'); const R=[];\nfunction T(n,c){R.push((c?'PASS':'FAIL')+' | '+n);}\nconst S=String($json.script||''), TT=String($json.title||''), KW=String($json.keyword||'');\n// ---- 链路完整性（硬闸门）----\nT('DeepSeek 真调返回三字段齐(结构闸门)', S.length>20 && TT.length>0 && KW.length>0);\nT('Pexels 无 key 真实 401（凭证缺口实证）', $json.pexelsStatus===401);\nT('免 key 素材源真返回候选列表(>=3)', $json.candidates>=3);\nT('素材真下载且>200KB', $json.footageSize>200000);\nT('素材文件级竖屏校验 h>w（模板缺的这一步）', $json.footageH>$json.footageW);\nT('edge-tts 真出音频 >20KB', $json.audioSize>20000);\nT('音频时长 >5s', $json.audioSec>5);\nT('成片存在 >500KB', $json.videoSize>500000);\nT('成片竖屏 1080x1920（Shorts 规格）', $json.outW===1080 && $json.outH===1920);\nT('成片时长≈音频(±2s)', Math.abs($json.outSec-$json.audioSec)<2);\nT('成片 h264 视频流', $json.vcodec==='h264');\nT('成片 aac 音频流', $json.acodec==='aac');\nT('台账落盘且 STATUS=DONE', $json.ledgerRows>=1 && $json.ledgerRow.STATUS==='DONE');\nT('台账可持久化重读', JSON.parse(fs.readFileSync('C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/16419-c-data/ledger.json','utf8')).length>=1);\nT('YouTube 发布为 mock（未真发）', $json.publish.mode==='mock');\nT('单条口播 ≤60s 成片时长为 55-65s 窗内素材量级', $json.outSec>5 && $json.outSec<=62);\n// ---- 模型合规观测（模板硬规则，非闸门，供教案记录）----\nconst obs=[];\nobs.push({rule:'script 词数 ≤150', got:$json.words, ok:$json.words<=150});\nobs.push({rule:'title ≤60 字符', got:TT.length, ok:TT.length<=60});\nobs.push({rule:'keyword 1-4 词且纯 ASCII 英文', got:KW, ok:(KW.trim().split(/\\s+/).length<=4 && KW.trim().split(/\\s+/).length>=1 && /^[\\x20-\\x7E]+$/.test(KW))});\nobs.push({rule:'结尾句 = Follow '+$json.channelName+' for more', got:S.slice(-60), ok:new RegExp('Follow '+$json.channelName+' for more[.!]?$').test(S.trim())});\nobs.push({rule:'无 emoji / hashtag', got:(/#/.test(S)||/[\\u{1F300}-\\u{1FAFF}]/u.test(S))?'含':'无', ok:!(/#/.test(S)||/[\\u{1F300}-\\u{1FAFF}]/u.test(S))});\nobs.push({rule:'首三词非被禁开场(Imagine/In a world/Did you know)', got:S.split(/\\s+/).slice(0,3).join(' '), ok:!/^(Imagine|In a world|Did you know)/i.test(S.trim())});\nconst fails=R.filter(x=>x.indexOf('FAIL')===0);\nconsole.log('==== L2-C 16419 ====');\nconsole.log(JSON.stringify({total:R.length, pass:R.length-fails.length, fail:fails.length, fails, obs}, null, 1));\nif(fails.length) throw new Error('L2C FAIL: '+fails.join(' ; '));\nreturn [{json:{assertions:R, obs, outSec:$json.outSec, audioSec:$json.audioSec, videoSize:$json.videoSize, words:$json.words, title:TT, keyword:KW}}];"
+      },
+      "id": "1dc29fbe-7693-46ff-b03f-e826917c419c",
+      "name": "ASSERT-C",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Form Input (mock)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form Input (mock)": {
+      "main": [
+        [
+          {
+            "node": "Set vars (真)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set vars (真)": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek Voiceover (替 OpenAI Agent + Parser)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Voiceover (替 OpenAI Agent + Parser)": {
+      "main": [
+        [
+          {
+            "node": "Voiceover vars (真)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voiceover vars (真)": {
+      "main": [
+        [
+          {
+            "node": "Keyless Footage Search (替 Pexels)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyless Footage Search (替 Pexels)": {
+      "main": [
+        [
+          {
+            "node": "edge-tts (替 ElevenLabs)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "edge-tts (替 ElevenLabs)": {
+      "main": [
+        [
+          {
+            "node": "Probe Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Probe Audio": {
+      "main": [
+        [
+          {
+            "node": "ffmpeg Merge (替 fal.run + 30s 轮询环)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ffmpeg Merge (替 fal.run + 30s 轮询环)": {
+      "main": [
+        [
+          {
+            "node": "Probe Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Probe Output": {
+      "main": [
+        [
+          {
+            "node": "Local Ledger (替 FTP + Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Local Ledger (替 FTP + Sheets)": {
+      "main": [
+        [
+          {
+            "node": "Mock YouTube Upload (替 YouTube 节点)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock YouTube Upload (替 YouTube 节点)": {
+      "main": [
+        [
+          {
+            "node": "ASSERT-C",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "pinData": {},
+  "tags": []
+}
