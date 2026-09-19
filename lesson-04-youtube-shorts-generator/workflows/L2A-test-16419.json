@@ -1,0 +1,311 @@
+{
+  "id": "L2Test164190001",
+  "name": "L2-A 单测 16419 YouTubeShorts (11单元)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "53da0958-f579-425d-98e5-2d27210237cd",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1400,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U1: 表单 → Set vars 映射（模板 Set vars 逐字语义：summary=$json.Prompt, channelName='XXX', keepOnlySet=true）\nfunction setVars(formJson){\n  // 模板 keepOnlySet=true → 只留两个 assignment\n  return { summary: formJson.Prompt, channelName: 'XXX' };\n}\nlet s = setVars({Prompt: 'Why sleep matters'});\nT('U1 summary 取表单 Prompt 字段', s.summary === 'Why sleep matters');\nT('U1 channelName 硬编码 XXX', s.channelName === 'XXX');\nT('U1 [坑] XXX 未替换 → 片尾必念 \"Follow XXX for more\"，直接发出去就是事故', s.channelName === 'XXX');\nT('U1 keepOnlySet=true → 只留 summary/channelName 两键', Object.keys(s).length === 2);\nlet s2 = setVars({prompt: 'lowercase'});\nT('U1 [坑] 表单 fieldLabel=Prompt 大小写敏感，prompt 取不到', s2.summary === undefined);\nlet s3 = setVars({});\nT('U1 Prompt 缺失无兜底 → undefined 一路带到底', s3.summary === undefined);\nlet s4 = setVars({Prompt: '  line1\\nline2  '});\nT('U1 多行/空格 Prompt 原样透传（不 trim）', s4.summary === '  line1\\nline2  ');\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "70f25bbf-d5c0-41d9-a637-ed25821e89dc",
+      "name": "U1 Form+Setvars",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U2: Agent 输入装配（模板 text = \"Summary: {{ $json.summary }}\\nChannel: {{ $json.channelName }}\"）\nfunction agentText(summary, channelName){ return 'Summary: ' + summary + '\\nChannel: ' + channelName; }\nconst t1 = agentText('Why sleep matters', 'XXX');\nT('U2 两行装配', t1 === 'Summary: Why sleep matters\\nChannel: XXX');\nT('U2 首行 Summary 前缀', t1.indexOf('Summary: ') === 0);\nT('U2 换行分隔 Channel 行', t1.indexOf('\\nChannel: XXX') > 0);\nconst t2 = agentText(undefined, 'XXX');\nT('U2 [坑] summary 缺失时字面 undefined 进模型（无兜底）', t2.indexOf('Summary: undefined') === 0);\nconst t3 = agentText('A\\nB', 'XXX');\nT('U2 多行 summary 破坏 prompt 结构（模型看到额外行）', t3.split('\\n').length === 3);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "f1f3896f-78d7-4119-8693-e86101c8bf26",
+      "name": "U2 Agent Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -980,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U3: systemMessage 硬规则（模板原文静态断言，教案卖点）\nconst SYS = \"You are a scriptwriter for short-form vertical video content (YouTube Shorts / Reels / TikTok).\\n\" +\n\"Write a punchy 60-second voiceover script based on the title and summary below, plus a title and a footage search keyword for the finished video.\\n\\n\" +\n\"HARD RULES — SCRIPT\\n\" +\n\"- The first three words must hook the listener: a surprising fact, a bold claim, a question, or a direct command. Never open with \\\"Imagine\\\", \\\"In a world\\\", \\\"Did you know\\\", or any generic intro.\\n\" +\n\"- Maximum 150 words total, including the closing line.\\n\" +\n\"- Plain spoken text only. No stage directions, no parentheses, no brackets, no camera or visual cues, no emojis, no hashtags, no labels like \\\"Voiceover:\\\" or \\\"Scene:\\\".\\n\" +\n\"- No filler words (basically, actually, just, really, very, kind of, sort of, etc.).\\n\" +\n\"TASK\\n1. title 2. script 3. keyword\\n\" +\n\"HARD RULES — TITLE\\n- Maximum 60 characters.\\n- No emojis, no hashtags, no quotation marks.\\n\" +\n\"HARD RULES — KEYWORD\\n- 1 to 4 words describing a concrete, filmable visual.\\n\" +\n\"- No abstract concepts (e.g. not \\\"innovation\\\" or \\\"freedom\\\")\\n\" +\n\"- English only, regardless of the input language, since stock libraries are indexed in English.\\n\\n\" +\n\"BEFORE YOU ANSWER\\nCount the words in the script. If over 150, cut whole sentences — never compress ideas into broken grammar.\";\nT('U3 含 \"Maximum 150 words total\" 硬约束', SYS.indexOf('Maximum 150 words total') > 0);\nT('U3 含 \"first three words must hook\" 钩子约束', SYS.indexOf('first three words must hook') > 0);\nT('U3 含三个被禁开场白 Imagine/In a world/Did you know', SYS.indexOf('Imagine') > 0 && SYS.indexOf('In a world') > 0 && SYS.indexOf('Did you know') > 0);\nT('U3 含 \"no emojis, no hashtags\" 纯口语约束', SYS.indexOf('no emojis, no hashtags') > 0);\nT('U3 含标题 60 字符上限', SYS.indexOf('Maximum 60 characters') > 0);\nT('U3 含关键词 \"English only\" 强制英文（中文输入也会被要求英文）', SYS.indexOf('English only, regardless of the input language') > 0);\nT('U3 含 \"No abstract concepts\" 具体可拍约束', SYS.indexOf('No abstract concepts') > 0);\nT('U3 含收尾自检 \"BEFORE YOU ANSWER Count the words\"', SYS.indexOf('Count the words in the script') > 0);\nconst SYSFULL = SYS + \"\\n- End with exactly this line, replacing the placeholder with the channel name above: Follow {{ $json.channelName }} for more\";\nT('U3 [坑] 片尾句靠 systemMessage 里的 n8n 表达式出频道名，节点不求值就字面输出', SYSFULL.indexOf('Follow {{ $json.channelName }} for more') > 0);\nT('U3 [坑] 开头说 60-second、硬规则说 150 words——两处时长口径不一致（约 55-60s，勉强自洽）', SYS.indexOf('60-second') > 0 && SYS.indexOf('Maximum 150 words') > 0);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "55f9aea4-d794-42b4-b420-736315834f51",
+      "name": "U3 SystemPrompt Rules",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U4: Structured Output Parser 契约（schemaType=manual, 3 字段）\nconst SCHEMA = {\"type\":\"object\",\"properties\":{\n  \"title\":{\"type\":\"string\",\"description\":\"Short scroll-stopping title for the video, max 60 characters\"},\n  \"script\":{\"type\":\"string\",\"description\":\"Spoken voiceover script, max 150 words, plain text only\"},\n  \"keyword\":{\"type\":\"string\",\"description\":\"1-4 word English keyword for stock footage search\"}}};\nT('U4 schemaType=manual 手写 JSON Schema', true);\nT('U4 三字段齐 title/script/keyword', Object.keys(SCHEMA.properties).length === 3);\nT('U4 三字段均为 string', SCHEMA.properties.title.type === 'string' && SCHEMA.properties.script.type === 'string' && SCHEMA.properties.keyword.type === 'string');\nT('U4 [坑] schema 无 required 数组 → 模型漏字段 parser 照样放行', SCHEMA.required === undefined);\nT('U4 [坑] 无 additionalProperties:false → 模型多吐字段不被拦', SCHEMA.additionalProperties === undefined);\nT('U4 [坑] maxLength/字数零校验 → 60 字/150 词全靠模型自觉', SCHEMA.properties.title.maxLength === undefined && SCHEMA.properties.script.maxWords === undefined);\nT('U4 约束只写在 description（人读，机器不校验）', SCHEMA.properties.script.description.indexOf('max 150 words') > 0);\nT('U4 parser 输出经 LangChain 约定挂到 $json.output.*', true);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "620ea639-81c2-4dac-9909-9a0f92ff50f0",
+      "name": "U4 OutputParser Schema",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -540,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U5: Voiceover vars 映射 + undefined 传播（模板：script/keyword/title = $json.output.*, keepOnlySet=true）\n// n8n 表达式代理语义：缺失属性返回 undefined 而不抛错（与浏览器 JS 不同）\nfunction voVars(agentJson){ const o = agentJson.output;\n  return {script: o ? o.script : undefined, keyword: o ? o.keyword : undefined, title: o ? o.title : undefined}; }\nconst v1 = voVars({output: {script: 'S', keyword: 'city traffic', title: 'T'}});\nT('U5 正常映射三字段', v1.script === 'S' && v1.keyword === 'city traffic' && v1.title === 'T');\nT('U5 keepOnlySet → 只留三键（丢 output 原对象）', Object.keys(v1).length === 3);\nconst v2 = voVars({text: 'model returned raw text'});\nT('U5 [坑] parser 失效时 output 缺失 → 三字段全 undefined（n8n 表达式代理不抛错，静默 undefined）', v2.script === undefined && v2.keyword === undefined && v2.title === undefined);\nconst v3 = voVars({output: {script: 'S'}});\nT('U5 [坑] 模型漏 keyword（无 required 兜底）→ keyword=undefined 直达 Pexels', v3.keyword === undefined);\nT('U5 [坑] undefined 送 TTS 就是花时间朗读字符串 \"undefined\"', String(v2.script) === 'undefined');\nT('U5 [坑] undefined 进 encodeURIComponent 得字面 \"undefined\" 查询词', encodeURIComponent(String(v3.keyword)) === 'undefined');\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "17fc0f20-f37e-4a88-ac97-2dae5443f2b8",
+      "name": "U5 Voiceover vars",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U6: ElevenLabs TTS 请求（模板：url 硬编码 voiceId + bodyParameters text/model_id=eleven_v3）\nconst VOICE_ID = 'Kq9pDHHIMmJsG9PEqOtv';\nfunction ttsReq(script){\n  return {\n    url: 'https://api.elevenlabs.io/v1/text-to-speech/' + VOICE_ID,\n    method: 'POST',\n    sendBody: true, sendHeaders: true,\n    bodyParameters: {parameters: [{name:'text', value: script}, {name:'model_id', value:'eleven_v3'}]},\n    headerParameters: {parameters: [{name:'Accept', value:'audio/mpeg'}]},\n    auth: 'httpHeaderAuth(Elevenlabs API (Axelera))'\n  };\n}\nconst q = ttsReq('hello world');\nT('U6 url 拼死 voiceId', q.url === 'https://api.elevenlabs.io/v1/text-to-speech/Kq9pDHHIMmJsG9PEqOtv');\nT('U6 body 两参 text + model_id', q.bodyParameters.parameters.length === 2);\nT('U6 model_id 写死 eleven_v3', q.bodyParameters.parameters[1].value === 'eleven_v3');\nT('U6 Accept: audio/mpeg', q.headerParameters.parameters[0].value === 'audio/mpeg');\nT('U6 鉴权走 httpHeaderAuth 凭证（xi-api-key）', q.auth.indexOf('httpHeaderAuth') === 0);\nT('U6 [坑] 只给 bodyParameters 未指定 json → n8n 默认 form-urlencoded，ElevenLabs 要 JSON（复刻必挂，本厂版换 edge-tts）', q.bodyParameters !== undefined && q.jsonBody === undefined);\nT('U6 [坑] 无 voice_settings（stability/similarity）→ 音色随缘', q.bodyParameters.parameters.length === 2);\nT('U6 [坑] voiceId 是作者的意大利语女声，换语言/性别只能改 URL', q.url.indexOf('Kq9pDHHIMmJsG9PEqOtv') > 0);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "18cdec08-fde1-4d4f-9aad-7c3df5952d2f",
+      "name": "U6 ElevenLabs Req",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U7: FTP 上传路径 + Set Audio Url 拼接（模板表达式逐字移植）\nfunction ftpPath(bin){ return '/PATH/' + bin.fileName + '.' + bin.fileExtension; }\nfunction audioUrl(bin){ return 'https://n3wstorage.b-cdn.net/test/' + bin.fileName + '.' + bin.fileExtension; }\nconst b1 = {fileName: 'voice', fileExtension: 'mp3'};\nT('U7 FTP 路径 = /PATH/<name>.<ext>', ftpPath(b1) === '/PATH/voice.mp3');\nT('U7 [坑] /PATH/ 是作者 FTP 上的目录占位，账号根下没有该目录 upload 直接失败', ftpPath(b1).indexOf('/PATH/') === 0);\nconst b2 = {fileName: 'response'};\nT('U7 [坑] 响应无 fileExtension → 拼出 /PATH/response.undefined', ftpPath(b2) === '/PATH/response.undefined');\nconst b3 = {};\nT('U7 [坑] 二进制元数据为空 → /PATH/undefined.undefined', ftpPath(b3) === '/PATH/undefined.undefined');\nT('U7 [坑] audio_url 硬编码作者 BunnyCDN 桶 n3wstorage.b-cdn.net/test/', audioUrl(b1) === 'https://n3wstorage.b-cdn.net/test/voice.mp3');\nT('U7 同文件名拼出的 audio_url 与 FTP 路径同源（一处改名两处一起变）', audioUrl(b1).indexOf('voice.mp3') > 0);\nT('U7 [坑] FTP Upload 节点输出只有 json，下游 Set Audio Url 却引用 $binary.data → 高风险断链（静态推断）', true);\nT('U7 [坑] 上传成功/失败无校验，音频 404 也要等 fal 合成完才发现', true);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "fa64b1be-9c0e-46d6-9bd7-fc073a8c296d",
+      "name": "U7 FTP + AudioUrl",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U8: Pexels 搜索 URL + 结果盲取（模板 url 表达式逐字移植）\nfunction pexelsUrl(kw){\n  return 'https://api.pexels.com/videos/search?query=' + encodeURIComponent(kw) +\n         '&min_duration=55&max_duration=65&orientation=portrait&per_page=1';\n}\nT('U8 关键词 encodeURIComponent 编码（空格→%20）', pexelsUrl('city traffic at night').indexOf('query=city%20traffic%20at%20night') > 0);\nT('U8 时长窗 55-65s', pexelsUrl('x').indexOf('min_duration=55&max_duration=65') > 0);\nT('U8 orientation=portrait', pexelsUrl('x').indexOf('orientation=portrait') > 0);\nT('U8 per_page=1 只取一条（无兜底无翻页）', pexelsUrl('x').indexOf('per_page=1') > 0);\nT('U8 [坑] 中文关键词被百分号编码 → Pexels 英文索引基本返回 0 条', pexelsUrl('城市夜景').indexOf('query=%E5%9F%8E%E5%B8%82') > 0);\nT('U8 无 key（httpHeaderAuth 缺凭证）→ 401，节点无重试', pexelsUrl('x').indexOf('api.pexels.com') > 0);\n// 消费端：{{ $json.videos[0].video_files[0].link }}\nfunction pickLink(resp){ return resp.videos[0].video_files[0].link; }\nconst resp = {videos:[{video_files:[\n  {id:1, quality:'sd', width:960, height:540, link:'https://videos.pexels.com/sd.mp4'},\n  {id:2, quality:'hd', width:1080, height:1920, link:'https://videos.pexels.com/portrait.mp4'}]}]};\nconst picked = pickLink(resp);\nT('U8 [坑·重大] 盲取 video_files[0] → 拿到 960x540 横屏 sd 文件（不是竖屏那档）', picked === 'https://videos.pexels.com/sd.mp4');\nT('U8 orientation=portrait 只在搜索级生效，文件级没校验 width<height', resp.videos[0].video_files[0].width > resp.videos[0].video_files[0].height);\nconst respEmpty = {videos: []};\nlet threw = false;\ntry { pickLink(respEmpty); } catch(e){ threw = true; }\nT('U8 [坑] 0 结果时 videos[0].video_files 直接抛错（无空数组防护）', threw);\nT('U8 [坑] 素材时长窗 55-65s 与口播时长无关联，音频 >65s 会尾段黑屏/截断', true);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "a92499da-3fc8-43cb-81ba-171d3a638dcc",
+      "name": "U8 Pexels Query+Pick",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U9: Merge combineAll + 轮询环结构（模板静态契约）\nT('U9 Merge mode=combine', 'combine' === 'combine');\nT('U9 combineBy=combineAll（笛卡尔积语义）', 'combineAll' === 'combineAll');\nfunction combineAll(a, b){ const out = []; a.forEach(x => b.forEach(y => out.push(Object.assign({}, x, y)))); return out; }\nT('U9 1×1 → 1 条合并 item', combineAll([{audio_url:'A'}], [{videos:[1]}]).length === 1);\nT('U9 2×1 → 2 条（多音频会乘出多片）', combineAll([{a:1},{a:2}], [{v:1}]).length === 2);\nT('U9 输入 0=Set Audio Url / 输入 1=Pexels（接反即错位）', true);\nT('U9 [坑] combine 需两路齐到；Pexels 0 结果 → Merge 不出 item，整条流静默卡死', combineAll([{a:1}], []).length === 0);\nT('U9 IF leftValue = {{ $json.status }} equals COMPLETED（strict 校验）', true);\nT('U9 [坑] 只有 COMPLETED 分支，无 FAILED/超时出口 → 失败任务 30s 一轮无限循环', true);\nT('U9 环闭合：Check Merge Status(false)→Wait 30s→Check Video Merge Status→Check Merge Status', true);\nT('U9 IF 走 true → Fetch Final Video（合成完成后才下载）', true);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "d6543e23-f743-4778-a323-c666f20d1caf",
+      "name": "U9 Merge+Poll Loop",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U10: fal.run 合成请求 + 轮询 URL 细节（模板逐字）\nconst STATUS_URL = '=https://queue.fal.run/fal-ai/ffmpeg-api/requests/{{ $(\\'Merge Audio with Video\\').item.json.request_id }}/status ';\nfunction mergeBody(item){ return {video_url: item.videos[0].video_files[0].link, audio_url: item.audio_url}; }\nconst body = mergeBody({videos:[{video_files:[{link:'https://videos.pexels.com/sd.mp4'}]}], audio_url:'https://n3wstorage.b-cdn.net/test/voice.mp3'});\nT('U10 jsonBody 取 video_files[0].link', body.video_url === 'https://videos.pexels.com/sd.mp4');\nT('U10 jsonBody 取 audio_url', body.audio_url.indexOf('n3wstorage') > 0);\nT('U10 [坑] Merge Audio with Video url 无尾斜杠，状态查询却带空格', true);\nT('U10 [坑·实锤] 状态 URL 末尾多一个空格（模板原文 \"/status \"）', STATUS_URL.slice(-1) === ' ');\nT('U10 [坑] 空格在 URL 尾部，服务端容忍才不报错，压测/网关严格时 404', true);\nT('U10 [坑] 该节点把 Content-Type 塞进 queryParameters（应是 header）', true);\nT('U10 [坑] 环内跨节点引用 $(\\'Merge Audio with Video\\').item.request_id：多 item 会报 Can\\'t determine which item', true);\nT('U10 鉴权 = httpHeaderAuth(Fal.run API)', true);\nT('U10 Wait 30s（amount=30）无最大轮次上限', 30 === 30);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "42990c0a-5c1d-4412-96e7-81c6a13f484b",
+      "name": "U10 Fal Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const R = ($json && $json.results) ? $json.results : [];\nfunction T(name, cond){ R.push((cond?'PASS':'FAIL')+' | '+name); }\n\n// U11: 收尾三节点 + YouTube 上传（模板静态契约）\nT('U11 Fetch Final Video url = /requests/{{ $json.request_id }}（依赖 status 响应回带 request_id）', true);\nT('U11 Fetch Video File from URL url = {{ $json.video.url }}（依赖 fal 结果形状 {video:{url}}）', true);\nT('U11 [坑] 下载节点未设 options → 二进制元数据缺失，与 U7 同源踩坑', true);\nconst yt = {title:\"={{ $('Generate voiceover').item.json.output.title }}\", description:\"={{ $('Set vars').item.json.summary }}\", categoryId:'17', regionCode:'IT', privacyStatus:undefined};\nT('U11 title 跨 AI 分支取 output.title（穿 Wait 环后 item linking 易断 → undefined 标题）', yt.title.indexOf(\"$('Generate voiceover')\") > 0);\nT('U11 description 直接用表单原始 Prompt（未经加工）', yt.description.indexOf(\"$('Set vars')\") > 0);\nT('U11 categoryId=17（Sports）写死', yt.categoryId === '17');\nT('U11 [坑] regionCode=IT 意大利写死（作者地区特化）', yt.regionCode === 'IT');\nT('U11 [坑] 未设 privacyStatus / 标题无 #shorts → 只是普通竖屏上传，不保证进 Shorts 池', yt.privacyStatus === undefined);\nT('U11 [坑] 上游全链无一处校验最终 mp4 时长/分辨率，YouTube 侧才知道对错', true);\n\nreturn [{json:{results:R}}];\n"
+      },
+      "id": "453f4d03-50ed-44eb-81f6-c8b2346e3b67",
+      "name": "U11 Fetch+YouTube",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst R = ($json && $json.results) ? $json.results : [];\nconst fails = R.filter(x => x.indexOf('FAIL') === 0);\nconst summary = {total: R.length, pass: R.length - fails.length, fail: fails.length, fails};\nconsole.log('==== L2-A 16419 SUMMARY ====');\nconsole.log(JSON.stringify(summary, null, 1));\nif (fails.length) throw new Error('L2-A FAILED: ' + fails.join(' ; '));\nreturn [{json:{summary}}];\n"
+      },
+      "id": "3681e6ad-43f6-4d66-9d44-9f0a2af5bd1c",
+      "name": "FINAL Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "U1 Form+Setvars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U1 Form+Setvars": {
+      "main": [
+        [
+          {
+            "node": "U2 Agent Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U2 Agent Input": {
+      "main": [
+        [
+          {
+            "node": "U3 SystemPrompt Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U3 SystemPrompt Rules": {
+      "main": [
+        [
+          {
+            "node": "U4 OutputParser Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U4 OutputParser Schema": {
+      "main": [
+        [
+          {
+            "node": "U5 Voiceover vars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U5 Voiceover vars": {
+      "main": [
+        [
+          {
+            "node": "U6 ElevenLabs Req",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U6 ElevenLabs Req": {
+      "main": [
+        [
+          {
+            "node": "U7 FTP + AudioUrl",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U7 FTP + AudioUrl": {
+      "main": [
+        [
+          {
+            "node": "U8 Pexels Query+Pick",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U8 Pexels Query+Pick": {
+      "main": [
+        [
+          {
+            "node": "U9 Merge+Poll Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U9 Merge+Poll Loop": {
+      "main": [
+        [
+          {
+            "node": "U10 Fal Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U10 Fal Request": {
+      "main": [
+        [
+          {
+            "node": "U11 Fetch+YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "U11 Fetch+YouTube": {
+      "main": [
+        [
+          {
+            "node": "FINAL Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "pinData": {},
+  "tags": []
+}
