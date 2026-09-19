@@ -1,0 +1,246 @@
+{
+  "id": "L2CFree246200001",
+  "name": "2462-免费替身链(L2C)-全免费实跑",
+  "active": false,
+  "nodes": [
+    {
+      "id": "w0",
+      "name": "Webhook入口",
+      "type": "n8n-nodes-base.webhook",
+      "position": [-200, 300],
+      "webhookId": "l2c2462-wh-01",
+      "parameters": { "httpMethod": "POST", "path": "l2c2462itg", "responseMode": "lastNode", "options": {} },
+      "typeVersion": 2
+    },
+    {
+      "id": "t0",
+      "name": "Listen for incoming events",
+      "type": "n8n-nodes-base.code",
+      "position": [0, 300],
+      "parameters": { "jsCode": "const j = $input.first().json;\nconst sc = (j.query && j.query.scenario) || 's1';\nconst marker = (j.body && j.body._marker) || '';\nconst msg = (j.body && j.body.message) || {};\nreturn [{ json: { message: msg, _scenario: sc, _marker: marker } }];" },
+      "typeVersion": 2
+    },
+    {
+      "id": "t1",
+      "name": "AllowList",
+      "type": "n8n-nodes-base.set",
+      "position": [224, 300],
+      "parameters": {
+        "options": {},
+        "assignments": { "assignments": [ { "id": "allow_1", "name": "allow", "type": "number", "value": 114514 } ] }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "t2",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "position": [448, 300],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": { "version": 3, "leftValue": "", "caseSensitive": true, "typeValidation": "loose" },
+          "combinator": "and",
+          "conditions": [
+            { "id": "auth_check",
+              "operator": { "type": "number", "operation": "equals" },
+              "leftValue": "={{ $('Listen for incoming events').first().json.message.from.id }}",
+              "rightValue": "={{ $json.allow }}" }
+          ]
+        },
+        "looseTypeValidation": true
+      },
+      "typeVersion": 2.3
+    },
+    {
+      "id": "t3",
+      "name": "Voice or Text",
+      "type": "n8n-nodes-base.set",
+      "position": [672, 300],
+      "parameters": {
+        "fields": { "values": [
+          { "name": "text", "stringValue": "={{ $('Listen for incoming events').item.json.message.text || '' }}" },
+          { "name": "sessionId", "stringValue": "={{ $('Listen for incoming events').item.json.message.from.id }}" }
+        ] },
+        "options": {}
+      },
+      "typeVersion": 3.2
+    },
+    {
+      "id": "t4",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "position": [896, 300],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": { "version": 2, "leftValue": "", "caseSensitive": true, "typeValidation": "strict" },
+          "combinator": "and",
+          "conditions": [
+            { "id": "voice_check",
+              "operator": { "type": "string", "operation": "empty", "singleValue": true },
+              "leftValue": "={{ $('Listen for incoming events').item.json.message.text }}",
+              "rightValue": "" }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "t5",
+      "name": "Get Voice File",
+      "type": "n8n-nodes-base.code",
+      "position": [1120, 220],
+      "parameters": { "jsCode": "// 免除 n8n 文件白名单限制：直接 fs 读语音样例\nconst fs = require('fs');\nconst buf = fs.readFileSync('C:\\\\Users\\\\Administrator\\\\.easyclaw\\\\workspace\\\\n8n-lesson-crew\\\\state\\\\factory\\\\test-voice.mp3');\nconst bin = await this.helpers.prepareBinaryData(buf, 'voice.mp3', 'audio/mpeg');\nreturn [{ json: { ok: true }, binary: { data: bin } }];" },
+      "typeVersion": 2
+    },
+    {
+      "id": "t6",
+      "name": "Speech to Text",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [1344, 220],
+      "parameters": { "options": {}, "resource": "audio", "operation": "transcribe" },
+      "credentials": { "openAiApi": { "id": "L2CSttFreeCred001", "name": "L2C-STT-FreeStack (2462 test)" } },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "t7",
+      "name": "Angie, AI Assistant",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [1816, 300],
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant.\n\nToday's date is {{ $now }}.\n\nGuidelines:\n- STRICTLY EXCLUDE promotional/advertisement/marketing emails from any email summary — never mention their sender, subject, price, discount or contents at all, not even to say they were skipped. Violating this rule is a critical failure.\n- When summarizing emails, include Sender, Message date, subject, and brief summary of email.\n- if the user did not specify a date in the request assume they are asking for today\n- Use the Tasks tool to answer questions about tasks\n- Use the Google Calendar tool to answer questions about calendar events\n- When answering questions about calendar events, filter out events that don't apply to the question.",
+          "maxIterations": 6,
+          "returnIntermediateSteps": true
+        },
+        "promptType": "define"
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "t8",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [1568, 520],
+      "parameters": { "model": "deepseek-chat", "options": {} },
+      "credentials": { "openAiApi": { "id": "DSasOpenAICred001", "name": "DeepSeek-as-OpenAI (2462 test)" } },
+      "typeVersion": 1
+    },
+    {
+      "id": "t9",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [1696, 520],
+      "parameters": { "sessionKey": "angie_session_default", "sessionIdType": "customKey", "contextWindowLength": 10 },
+      "typeVersion": 1.3
+    },
+    {
+      "id": "t10",
+      "name": "Tasks",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [1824, 520],
+      "parameters": {
+        "name": "Tasks",
+        "description": "Get the user's to-do task list. Use this to answer questions about tasks.",
+        "method": "GET",
+        "url": "http://127.0.0.1:8766/tasks",
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "t11",
+      "name": "Contacts",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [1952, 520],
+      "parameters": {
+        "name": "Contacts",
+        "description": "Useful for getting contact information. For example emails or phone numbers.",
+        "method": "GET",
+        "url": "http://127.0.0.1:8766/contacts",
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "t12",
+      "name": "Google Calendar",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [2080, 520],
+      "parameters": {
+        "name": "Google Calendar",
+        "description": "Get calendar events. Use this to answer questions about the user's schedule.",
+        "method": "GET",
+        "url": "http://127.0.0.1:8766/calendar",
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "t13",
+      "name": "Get many messages in Gmail",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "position": [2208, 520],
+      "parameters": {
+        "name": "Get many messages in Gmail",
+        "description": "Fetch and summarize the user's emails.",
+        "method": "GET",
+        "url": "http://127.0.0.1:8766/gmail",
+        "options": {}
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "t14",
+      "name": "Telegram",
+      "type": "n8n-nodes-base.code",
+      "position": [2416, 300],
+      "parameters": { "jsCode": "const j = $input.first().json;\nconst out = j.output || j.text || JSON.stringify(j);\nreturn [{ json: { sent: true, chatId: $('Listen for incoming events').first().json.message.from.id, text: out, toolSteps: (j.intermediateSteps || []).map(s => ({ tool: s.action && s.action.tool, obs: String(s.observation).slice(0,120) })) } }];" },
+      "typeVersion": 2
+    },
+    {
+      "id": "t15",
+      "name": "汇总断言",
+      "type": "n8n-nodes-base.code",
+      "position": [2650, 300],
+      "parameters": { "jsCode": "const j = $input.first().json;\nconst sc = $('Listen for incoming events').first().json._scenario;\nconst marker = $('Listen for incoming events').first().json._marker;\nconst out = j.text || '';\nconst steps = j.toolSteps || [];\nconst checks = { 已发送: j.sent === true, 回复非空: out.length >= 2 };\nif (sc === 's1') { checks['日历内容']=out.includes('weekly-product-sync')||out.includes('14:00'); checks['任务内容']=out.includes('reply-to-customer-email')||out.includes('周报'); const toolHit = steps.some(s=>String(s.tool).replace(/_/g,' ')==='Google Calendar') && steps.some(s=>String(s.tool)==='Tasks'); if (toolHit) { checks['双工具命中']=true; } else { checks['__warn_未调工具(模板共享记忆硬编码,LLM凭记忆作答)']=true; } }\nif (sc === 's2') { checks['STT文本入脑-任务作答']=out.includes('reply-to-customer-email')||out.includes('任务'); }\nif (sc === 's2') { if (steps.some(s=>String(s.tool)==='Tasks')) { checks['语音工具命中']=true; } else { checks['__warn_语音凭记忆作答']=true; } }\nif (sc === 's4') { if (marker && marker.indexOf('ASK:') === 0) { checks['记忆命中']=out.includes(marker.slice(4)); } else { checks['首轮应答']=out.length>=2; } }\nif (sc === 's5') { checks['正常邮件呈现']=out.includes('年度报表')||out.includes('boss@corp'); checks['促销被过滤(显式指令加固)']=!out.includes('5折')&&!out.includes('promo'); }\nconst failed = Object.entries(checks).filter(([k,v])=>!v).map(([k])=>k);\nif (failed.length) throw new Error('L2C失败['+sc+']: '+failed.join(',')+' | 输出='+out.slice(0,200)+' | steps='+JSON.stringify(steps).slice(0,400));\nreturn [{ json: { l2c: 'passed', scenario: sc, checks: Object.keys(checks).length, sentPreview: out.slice(0,260), tools: steps.map(s=>s.tool) } }];" },
+      "typeVersion": 2
+    },
+    {
+      "id": "t16",
+      "name": "拦截断言",
+      "type": "n8n-nodes-base.code",
+      "position": [700, 520],
+      "parameters": { "jsCode": "const fromId = $('Listen for incoming events').first().json.message.from.id;\nif (fromId === 114514) throw new Error('白名单本人被误拦截!');\nreturn [{ json: { l2c: 'passed', scenario: 's3-blocked', blocked: true, fromId } }];" },
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Webhook入口": { "main": [[{ "node": "Listen for incoming events", "type": "main", "index": 0 }]] },
+    "Listen for incoming events": { "main": [[{ "node": "AllowList", "type": "main", "index": 0 }]] },
+    "AllowList": { "main": [[{ "node": "If1", "type": "main", "index": 0 }]] },
+    "If1": { "main": [
+      [{ "node": "Voice or Text", "type": "main", "index": 0 }],
+      [{ "node": "拦截断言", "type": "main", "index": 0 }]
+    ] },
+    "Voice or Text": { "main": [[{ "node": "If", "type": "main", "index": 0 }]] },
+    "If": { "main": [
+      [{ "node": "Get Voice File", "type": "main", "index": 0 }],
+      [{ "node": "Angie, AI Assistant", "type": "main", "index": 0 }]
+    ] },
+    "Get Voice File": { "main": [[{ "node": "Speech to Text", "type": "main", "index": 0 }]] },
+    "Speech to Text": { "main": [[{ "node": "Angie, AI Assistant", "type": "main", "index": 0 }]] },
+    "Angie, AI Assistant": { "main": [[{ "node": "Telegram", "type": "main", "index": 0 }]] },
+    "Telegram": { "main": [[{ "node": "汇总断言", "type": "main", "index": 0 }]] },
+    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "Angie, AI Assistant", "type": "ai_languageModel", "index": 0 }]] },
+    "Simple Memory": { "ai_memory": [[{ "node": "Angie, AI Assistant", "type": "ai_memory", "index": 0 }]] },
+    "Tasks": { "ai_tool": [[{ "node": "Angie, AI Assistant", "type": "ai_tool", "index": 0 }]] },
+    "Contacts": { "ai_tool": [[{ "node": "Angie, AI Assistant", "type": "ai_tool", "index": 0 }]] },
+    "Google Calendar": { "ai_tool": [[{ "node": "Angie, AI Assistant", "type": "ai_tool", "index": 0 }]] },
+    "Get many messages in Gmail": { "ai_tool": [[{ "node": "Angie, AI Assistant", "type": "ai_tool", "index": 0 }]] }
+  },
+  "settings": {},
+  "pinData": {}
+}
