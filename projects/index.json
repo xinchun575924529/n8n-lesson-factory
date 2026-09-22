@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-19 20:23:49",
+  "updatedAt": "2026-09-22 19:39:19",
   "projects": [
     {
       "id": 8965,
@@ -87,6 +87,16 @@
       "mode": "B",
       "selectedAt": "2026/9/16 20:29:18",
       "nameZh": "通过Stripe付款后经WhatsApp和Telegram交付数字产品"
+    },
+    {
+      "id": 2786,
+      "slug": "create-a-branded-ai-powered-website-chatbot",
+      "dir": "projects/2786-create-a-branded-ai-powered-website-chatbot",
+      "name": "Create a branded AI-powered website chatbot",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/22 19:38:12",
+      "nameZh": "创建品牌AI网站聊天机器人"
     }
   ]
 }
