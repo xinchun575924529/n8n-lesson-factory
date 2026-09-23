@@ -1,1 +1,5 @@
-C:\Users\Administrator\.easyclaw\workspace\tmp\10001-project.json
+{
+  "id": 10001,
+  "status": "deprecated",
+  "note": "本目录为 2026-09-24 误建（曾想把内部项目改号 10001），当日老板已定规则：对话发起的项目以 9 开头自动递增（起始 90001）。正式项目见 projects/90001-daily-sv-vertical-columns。本目录可安全删除。"
+}
