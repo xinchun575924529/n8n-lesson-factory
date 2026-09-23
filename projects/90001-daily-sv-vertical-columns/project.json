@@ -1,0 +1,33 @@
+{
+  "id": 90001,
+  "slug": "daily-sv-vertical-columns",
+  "dir": "projects/90001-daily-sv-vertical-columns",
+  "name": "Daily-SV Vertical Columns (AI short-video daily pipeline, customizable by student-chosen content column)",
+  "nameZh": "AI短视频日更流水线·专栏定制版（学员按体育新闻等专栏定制选题推荐）",
+  "url": null,
+  "origin": "internal",
+  "originNote": "自有产线 daily-sv 产品化；非 n8n 模板。内部项目编号 90001 起。",
+  "views": null,
+  "recent": null,
+  "nodeCount": null,
+  "nodeTypes": ["scheduleTrigger", "httpRequest", "executeCommand", "code", "bitable"],
+  "selection": {
+    "mode": "A",
+    "at": "2026/9/23 20:25:00",
+    "by": "boss-webchat"
+  },
+  "status": "research",
+  "createdAt": "2026/9/23 20:25:00",
+  "updatedAt": "2026/9/23 20:25:00",
+  "history": [
+    {
+      "at": "2026/9/23 20:25:00",
+      "event": "selected",
+      "mode": "A",
+      "note": "2026-09-23 女排日更片播放526创账号新高后，老板指令立项：产线产品化+按学员选专栏定制"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/90001-daily-sv-vertical-columns"
+  }
+}
