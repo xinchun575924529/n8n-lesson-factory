@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-25 18:34:09",
+  "updatedAt": "2026-09-26 07:49:46",
   "projects": [
     {
       "id": 8965,
@@ -96,7 +96,8 @@
       "status": "research",
       "mode": "B",
       "selectedAt": "2026/9/22 19:38:12",
-      "nameZh": "创建品牌AI网站聊天机器人"
+      "nameZh": "创建品牌AI网站聊天机器人",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-08-branded-ai-chatbot/"
     },
     {
       "id": 19457,
