@@ -1,0 +1,39 @@
+{
+  "id": 19457,
+  "slug": "send-daily-ai-market-briefings-to-telegram-disco",
+  "dir": "projects/19457-send-daily-ai-market-briefings-to-telegram-disco",
+  "name": "Send daily AI market briefings to Telegram, Discord and Postgres with OpenAI, Twelve Data, CoinGecko, FRED, QuantGist and Marketaux",
+  "url": "https://n8n.io/workflows/19457/",
+  "views": 4,
+  "recent": 8,
+  "nodeCount": 11,
+  "nodeTypes": [
+    "httpRequest",
+    "merge",
+    "postgres",
+    "set",
+    "telegram",
+    "discord",
+    "stickyNote",
+    "code"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/9/25 18:29:20",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/9/25 18:29:20",
+  "updatedAt": "2026/9/25 18:29:20",
+  "history": [
+    {
+      "at": "2026/9/25 18:29:20",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/19457-send-daily-ai-market-briefings-to-telegram-disco"
+  },
+  "nameZh": "每日AI市场简报推送至Telegram、Discord和Postgres，使用OpenAI、Twelve Data、CoinGecko、FRED、QuantGist和Marketaux"
+}
