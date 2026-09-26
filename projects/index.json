@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-26 07:49:46",
+  "updatedAt": "2026-09-26 11:29:12",
   "projects": [
     {
       "id": 8965,
@@ -108,6 +108,16 @@
       "mode": "B",
       "selectedAt": "2026/9/25 18:29:20",
       "nameZh": "每日AI市场简报推送至Telegram、Discord和Postgres，使用OpenAI、Twelve Data、CoinGecko、FRED、QuantGist和Marketaux"
+    },
+    {
+      "id": 19710,
+      "slug": "generate-structured-research-reports-with-openai",
+      "dir": "projects/19710-generate-structured-research-reports-with-openai",
+      "name": "Generate structured research reports with OpenAI, Wikipedia, Google Sheets, and Slack",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/26 11:26:20",
+      "nameZh": "使用OpenAI、Wikipedia、Google Sheets和Slack生成结构化研究报告"
     }
   ]
 }
