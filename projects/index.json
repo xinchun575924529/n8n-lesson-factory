@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-27 08:58:52",
+  "updatedAt": "2026-09-28 07:08:46",
   "projects": [
     {
       "id": 8965,
@@ -128,6 +128,16 @@
       "mode": "B",
       "selectedAt": "2026/9/27 08:57:00",
       "nameZh": "通过Jobright表单按职位和地点查找美国相关职位"
+    },
+    {
+      "id": 18552,
+      "slug": "manage-rental-equipment-bookings-and-returns-wit",
+      "dir": "projects/18552-manage-rental-equipment-bookings-and-returns-wit",
+      "name": "Manage rental equipment bookings and returns with DeepSeek, Google Sheets, Gmail, and Discord",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/28 06:51:40",
+      "nameZh": "用DeepSeek、Google Sheets、Gmail和Discord管理租赁设备预订与归还"
     }
   ]
 }
