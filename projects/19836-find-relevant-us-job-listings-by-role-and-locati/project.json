@@ -1,0 +1,36 @@
+{
+  "id": 19836,
+  "slug": "find-relevant-us-job-listings-by-role-and-locati",
+  "dir": "projects/19836-find-relevant-us-job-listings-by-role-and-locati",
+  "name": "Find relevant US job listings by role and location with Jobright forms",
+  "url": "https://n8n.io/workflows/19836/",
+  "views": 16,
+  "recent": 16,
+  "nodeCount": 5,
+  "nodeTypes": [
+    "httpRequest",
+    "stickyNote",
+    "code",
+    "formTrigger",
+    "form"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/9/27 08:57:00",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/9/27 08:57:00",
+  "updatedAt": "2026/9/27 08:57:00",
+  "history": [
+    {
+      "at": "2026/9/27 08:57:00",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/19836-find-relevant-us-job-listings-by-role-and-locati"
+  },
+  "nameZh": "通过Jobright表单按职位和地点查找美国相关职位"
+}
