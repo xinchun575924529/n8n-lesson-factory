@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-26 11:29:12",
+  "updatedAt": "2026-09-27 08:58:52",
   "projects": [
     {
       "id": 8965,
@@ -118,6 +118,16 @@
       "mode": "B",
       "selectedAt": "2026/9/26 11:26:20",
       "nameZh": "使用OpenAI、Wikipedia、Google Sheets和Slack生成结构化研究报告"
+    },
+    {
+      "id": 19836,
+      "slug": "find-relevant-us-job-listings-by-role-and-locati",
+      "dir": "projects/19836-find-relevant-us-job-listings-by-role-and-locati",
+      "name": "Find relevant US job listings by role and location with Jobright forms",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/9/27 08:57:00",
+      "nameZh": "通过Jobright表单按职位和地点查找美国相关职位"
     }
   ]
 }
