@@ -1,0 +1,651 @@
+{
+  "id": "L2C19710real0001",
+  "name": "L2C-Real-19710-ResearchAssistant",
+  "meta": {
+    "templateId": "19710"
+  },
+  "nodes": [
+    {
+      "id": "c0",
+      "name": "Run",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -700,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c1",
+      "name": "Receive Research Topic",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "topic",
+              "type": "string",
+              "value": "honey production"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c2",
+      "name": "Validate Research Topic",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -260,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 3,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "cc1",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.topic }}",
+              "rightValue": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c2b",
+      "name": "Prep Prompt1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst prompt = \"You are a research assistant.\\n\\nGenerate 5 focused web search queries for the following research topic:\\n\\n\" + $json.topic + \"\\n\\nThe queries should cover:\\n- General overview\\n- Latest developments\\n- Benefits\\n- Challenges\\n- Future trends\\n\\nReturn only a JSON array of search queries.\";\nreturn [{ json: { topic: $json.topic, reqBody: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.7 }) } }];\n"
+      }
+    },
+    {
+      "id": "c3",
+      "name": "Generate Search Queries (DeepSeek)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -40,
+        400
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer __DEEPSEEK_KEY__"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.reqBody }}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "c4",
+      "name": "Reshape to OpenAI output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        180,
+        400
+      ],
+      "parameters": {
+        "jsCode": "\nconst text = $json.choices?.[0]?.message?.content || '';\nreturn [{ json: { output: [{ content: [{ text }] }] } }];\n"
+      }
+    },
+    {
+      "id": "c5",
+      "name": "Parse Search Queries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        400
+      ],
+      "parameters": {
+        "jsCode": "\nconst text = $json.output?.[0]?.content?.[0]?.text || '';\n\nconst cleaned = text\n  .replace(/```json\\s*/i, '')\n  .replace(/```\\s*/g, '')\n  .trim();\n\nconst queries = JSON.parse(cleaned);\n\nreturn queries.map(query => ({\n  json: {\n    query\n  }\n}));\n"
+      }
+    },
+    {
+      "id": "c6",
+      "name": "Search Web (DBpedia)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        620,
+        400
+      ],
+      "parameters": {
+        "url": "=https://lookup.dbpedia.org/api/search",
+        "options": {
+          "lowercaseHeaders": false,
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query }}"
+            },
+            {
+              "name": "format",
+              "value": "JSON"
+            },
+            {
+              "name": "maxResults",
+              "value": "5"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c7",
+      "name": "Shape Search Results (adapter)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        400
+      ],
+      "parameters": {
+        "jsCode": "\nconst docs = $json.docs || [];\nconst search = docs.map(d => {\n  const uri = (d.resource && d.resource[0]) || '';\n  const title = decodeURIComponent(uri.split('/').pop() || '').replace(/_/g, ' ');\n  const comment = (d.comment && d.comment[0]) || '';\n  return {\n    title: title,\n    snippet: comment.replace(/<\\/?B>/g, ''),\n    pageid: Math.abs(uri.split('').reduce((a, c) => a + c.charCodeAt(0), 0)),\n    timestamp: ''\n  };\n}).filter(x => x.title);\nreturn [{ json: { query: { search: search } } }];\n"
+      }
+    },
+    {
+      "id": "c8",
+      "name": "Prepare Search Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        400
+      ],
+      "parameters": {
+        "jsCode": "\nconst results = $input.first().json.query.search || [];\n\nreturn results.map(item => ({\n  json: {\n    title: item.title,\n    url: `https://en.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`,\n    snippet: item.snippet\n      ? item.snippet.replace(/<[^>]*>/g, '')\n      : '',\n    pageId: item.pageid,\n    timestamp: item.timestamp\n  }\n}));\n"
+      }
+    },
+    {
+      "id": "c9",
+      "name": "Process Search Results",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        400
+      ],
+      "parameters": {
+        "options": {}
+      }
+    },
+    {
+      "id": "c10",
+      "name": "Extract Content (DBpedia)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1500,
+        520
+      ],
+      "parameters": {
+        "url": "=https://lookup.dbpedia.org/api/search",
+        "options": {
+          "timeout": 30000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "format",
+              "value": "JSON"
+            },
+            {
+              "name": "maxResults",
+              "value": "1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "c11",
+      "name": "Shape Extract (adapter)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst docs = $json.docs || [];\nlet extract = '';\nif (docs.length) {\n  const d = docs[0];\n  const parts = [];\n  if (d.label && d.label[0]) parts.push(d.label[0].replace(/<\\/?B>/g, ''));\n  if (d.comment && d.comment[0]) parts.push(d.comment[0].replace(/<\\/?B>/g, ''));\n  if (d.category) parts.push('Categories: ' + d.category.map(c => (c.label && c.label[0]) || '').filter(Boolean).join(', '));\n  extract = parts.join('. ');\n}\nreturn [{ json: { query: { pages: { p: { extract: extract } } } } }];\n"
+      }
+    },
+    {
+      "id": "c12",
+      "name": "Clean Website Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1940,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst response = $json;\n\nconst pages = response.query?.pages || {};\nconst page = Object.values(pages)[0];\n\nconst original = $('Process Search Results').item.json;\n\nreturn [\n  {\n    json: {\n      title: original.title,\n      url: original.url,\n      snippet: original.snippet,\n      pageId: original.pageId,\n      content: page?.extract || ''\n    }\n  }\n];\n"
+      }
+    },
+    {
+      "id": "c13",
+      "name": "Merge Research Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2160,
+        520
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "c13b",
+      "name": "Prep Prompt2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        640
+      ],
+      "parameters": {
+        "jsCode": "\nconst prompt = \"You are an AI research assistant.\\n\\nResearch Topic:\\n\" + $json.title + \"\\n\\nAnalyze the collected research information below.\\n\\nProvide:\\n\\n1. Executive Summary\\n2. Key Findings\\n3. Important Facts\\n4. Benefits\\n5. Challenges\\n6. Latest Trends\\n7. Future Outlook\\n8. Source References\\n\\nUse only information supported by the provided research content.\\n\\nIMPORTANT: Format every section heading exactly as a markdown level-3 heading with the ### prefix, e.g. ### Executive Summary — the ### prefix is mandatory.\\n\\nResearch Content:\\n\" + ($json.content || '').slice(0, 12000);\nreturn [{ json: { ...$json, reqBody: JSON.stringify({ model: 'deepseek-chat', messages: [{ role: 'user', content: prompt }], temperature: 0.7 }) } }];\n"
+      }
+    },
+    {
+      "id": "c14",
+      "name": "AI Research Engine (DeepSeek)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2380,
+        520
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.deepseek.com/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer __DEEPSEEK_KEY__"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.reqBody }}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "c15",
+      "name": "Reshape2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2600,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst text = $json.choices?.[0]?.message?.content || '';\nreturn [{ json: { output: [{ content: [{ text }] }] } }];\n"
+      }
+    },
+    {
+      "id": "c16",
+      "name": "Research Report Formatter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2820,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst report = $json.output?.[0]?.content?.[0]?.text || '';\n\nif (!report) {\n  throw new Error('AI research report is empty.');\n}\n\nfunction extractSection(text, heading, nextHeadings = []) {\n  const escapedHeading = heading.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n\n  let pattern = `###\\\\s*${escapedHeading}\\\\s*\\\\n([\\\\s\\\\S]*?)`;\n\n  if (nextHeadings.length > 0) {\n    const nextPattern = nextHeadings\n      .map(h => `###\\\\s*${h.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}`)\n      .join('|');\n\n    pattern += `(?=\\\\n(?:${nextPattern})|$)`;\n  } else {\n    pattern += '$';\n  }\n\n  const match = text.match(new RegExp(pattern, 'i'));\n\n  return match ? match[1].trim() : '';\n}\n\nconst headings = [\n  'Executive Summary',\n  'Key Findings',\n  'Important Facts',\n  'Benefits',\n  'Challenges',\n  'Latest Trends',\n  'Future Outlook',\n  'Source References'\n];\n\nreturn [\n  {\n    json: {\n      topic: $('Merge Research Data').first().json.title,\n      report: report.trim(),\n      executiveSummary: extractSection(report, 'Executive Summary', headings.slice(1)),\n      keyFindings: extractSection(report, 'Key Findings', headings.slice(2)),\n      importantFacts: extractSection(report, 'Important Facts', headings.slice(3)),\n      benefits: extractSection(report, 'Benefits', headings.slice(4)),\n      challenges: extractSection(report, 'Challenges', headings.slice(5)),\n      latestTrends: extractSection(report, 'Latest Trends', headings.slice(6)),\n      futureOutlook: extractSection(report, 'Future Outlook', headings.slice(7)),\n      sourceReferences: extractSection(report, 'Source References'),\n      generatedAt: new Date().toISOString()\n    }\n  }\n];\n"
+      }
+    },
+    {
+      "id": "c17",
+      "name": "Archive Report (local JSON, 替 Sheets)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3040,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst fs = require('fs');\nconst p = 'C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/19710-data/reports.json';\nlet rows = [];\ntry { rows = JSON.parse(fs.readFileSync(p, 'utf8')); } catch (e) {}\nconst row = { Date: $json.generatedAt, Topic: $json.topic, Result: $json.report, Summary: $json.executiveSummary };\nconst i = rows.findIndex(r => r.Topic === row.Topic);\nif (i >= 0) rows[i] = row; else rows.push(row);\nfs.writeFileSync(p, JSON.stringify(rows, null, 2));\nreturn [{ json: $json }];\n"
+      }
+    },
+    {
+      "id": "c18",
+      "name": "Notify Feishu (替 Slack)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3260,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst APP_ID = 'cli_aa162e76eff8dbb6';\nconst APP_SECRET = '__FEISHU_APP_SECRET__';\nconst CHAT = 'oc_35e82b8f2dac5774ace2961798400ac5';\nconst tok = await this.helpers.httpRequest({\n  method: 'POST', url: 'https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal',\n  body: { app_id: APP_ID, app_secret: APP_SECRET }, json: true });\nconst text = 'AI Personal Research Assistant\\n\\nResearch completed successfully.\\n\\nTopic:\\n' + $json.topic +\n  '\\n\\nSummary: ' + ($json.executiveSummary || '(empty)').slice(0, 200);\nconst r = await this.helpers.httpRequest({\n  method: 'POST', url: 'https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id',\n  headers: { Authorization: 'Bearer ' + tok.tenant_access_token },\n  body: { receive_id: CHAT, msg_type: 'text', content: JSON.stringify({ text: text }) }, json: true });\nreturn [{ json: { ...$json, notifyCode: r.code } }];\n"
+      }
+    },
+    {
+      "id": "c19",
+      "name": "Return/Final (替 respondToWebhook)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3480,
+        520
+      ],
+      "parameters": {
+        "jsCode": "\nconst fs = require('fs');\nfs.writeFileSync('C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/19710-data/final.json', JSON.stringify($json, null, 2));\nfs.appendFileSync('C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/19710-data/final-writes.log', '1\\n');\nreturn [{ json: $json }];\n"
+      }
+    }
+  ],
+  "connections": {
+    "Run": {
+      "main": [
+        [
+          {
+            "node": "Receive Research Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Research Topic": {
+      "main": [
+        [
+          {
+            "node": "Validate Research Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Research Topic": {
+      "main": [
+        [
+          {
+            "node": "Prep Prompt1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Prompt1": {
+      "main": [
+        [
+          {
+            "node": "Generate Search Queries (DeepSeek)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Search Queries (DeepSeek)": {
+      "main": [
+        [
+          {
+            "node": "Reshape to OpenAI output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reshape to OpenAI output": {
+      "main": [
+        [
+          {
+            "node": "Parse Search Queries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Search Queries": {
+      "main": [
+        [
+          {
+            "node": "Search Web (DBpedia)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Web (DBpedia)": {
+      "main": [
+        [
+          {
+            "node": "Shape Search Results (adapter)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Search Results (adapter)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Search Results": {
+      "main": [
+        [
+          {
+            "node": "Process Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Search Results": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Extract Content (DBpedia)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Content (DBpedia)": {
+      "main": [
+        [
+          {
+            "node": "Shape Extract (adapter)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape Extract (adapter)": {
+      "main": [
+        [
+          {
+            "node": "Clean Website Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Website Content": {
+      "main": [
+        [
+          {
+            "node": "Merge Research Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Research Data": {
+      "main": [
+        [
+          {
+            "node": "Prep Prompt2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prep Prompt2": {
+      "main": [
+        [
+          {
+            "node": "AI Research Engine (DeepSeek)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Research Engine (DeepSeek)": {
+      "main": [
+        [
+          {
+            "node": "Reshape2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reshape2": {
+      "main": [
+        [
+          {
+            "node": "Research Report Formatter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Report Formatter": {
+      "main": [
+        [
+          {
+            "node": "Archive Report (local JSON, 替 Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Report (local JSON, 替 Sheets)": {
+      "main": [
+        [
+          {
+            "node": "Notify Feishu (替 Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Feishu (替 Slack)": {
+      "main": [
+        [
+          {
+            "node": "Return/Final (替 respondToWebhook)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Return/Final (替 respondToWebhook)": {
+      "main": [
+        [
+          {
+            "node": "Process Search Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "active": false,
+  "tags": []
+}
