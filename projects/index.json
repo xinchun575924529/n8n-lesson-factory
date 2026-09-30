@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-28 07:08:46",
+  "updatedAt": "2026-09-30 08:07:23",
   "projects": [
     {
       "id": 8965,
@@ -138,6 +138,16 @@
       "mode": "B",
       "selectedAt": "2026/9/28 06:51:40",
       "nameZh": "用DeepSeek、Google Sheets、Gmail和Discord管理租赁设备预订与归还"
+    },
+    {
+      "id": "90002",
+      "slug": "feishu-n8n-litchi-drone-waypoint-bot",
+      "dir": "projects/90002-feishu-n8n-litchi-drone-waypoint-bot",
+      "name": "feishu n8n Litchi drone waypoint bot",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026-09-30 08:07:18",
+      "nameZh": "飞书 n8n 荔枝无人机航点机器人"
     }
   ]
 }
