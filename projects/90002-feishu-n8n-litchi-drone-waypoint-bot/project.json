@@ -1,0 +1,38 @@
+{
+  "id": "90002",
+  "slug": "feishu-n8n-litchi-drone-waypoint-bot",
+  "dir": "projects/90002-feishu-n8n-litchi-drone-waypoint-bot",
+  "name": "feishu n8n Litchi drone waypoint bot",
+  "url": "",
+  "views": null,
+  "recent": null,
+  "nodeCount": 18,
+  "nodeTypes": [
+    "code",
+    "httpRequest",
+    "if",
+    "respondToWebhook",
+    "set",
+    "webhook",
+    "writeBinaryFile"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026-09-30 08:07:18",
+    "by": "boss-webchat"
+  },
+  "status": "research",
+  "createdAt": "2026-09-30 08:07:18",
+  "updatedAt": "2026-09-30 08:07:18",
+  "history": [
+    {
+      "at": "2026-09-30 08:07:18",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/90002-feishu-n8n-litchi-drone-waypoint-bot"
+  },
+  "nameZh": "飞书 n8n 荔枝无人机航点机器人"
+}
