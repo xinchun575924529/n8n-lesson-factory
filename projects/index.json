@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-01 14:45:55",
+  "updatedAt": "2026-10-03 10:48:06",
   "projects": [
     {
       "id": 8965,
@@ -157,7 +157,9 @@
       "status": "research",
       "mode": "B",
       "selectedAt": "2026/10/1 12:00:21",
-      "nameZh": "使用Groq、OpenAI和Google Drive生成社交媒体帖子和图片"
+      "nameZh": "使用Groq、OpenAI和Google Drive生成社交媒体帖子和图片",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-13-ai-social-post-generator/",
+      "repo": "n8n-lesson-13-ai-social-post-generator"
     }
   ]
 }
