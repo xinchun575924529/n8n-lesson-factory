@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-03 10:48:06",
+  "updatedAt": "2026-10-04 16:09:09",
   "projects": [
     {
       "id": 8965,
@@ -160,6 +160,16 @@
       "nameZh": "使用Groq、OpenAI和Google Drive生成社交媒体帖子和图片",
       "site": "https://xinchun575924529.github.io/n8n-lesson-13-ai-social-post-generator/",
       "repo": "n8n-lesson-13-ai-social-post-generator"
+    },
+    {
+      "id": 20211,
+      "slug": "build-and-deploy-tested-workflows-from-chat-with",
+      "dir": "projects/20211-build-and-deploy-tested-workflows-from-chat-with",
+      "name": "Build and deploy tested workflows from chat with Claude Sonnet",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/10/4 15:46:23",
+      "nameZh": "与Claude Sonnet聊天构建并部署经过测试的工作流"
     }
   ]
 }
