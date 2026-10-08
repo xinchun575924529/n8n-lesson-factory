@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-04 16:09:09",
+  "updatedAt": "2026-10-08 14:45:57",
   "projects": [
     {
       "id": 8965,
@@ -170,6 +170,16 @@
       "mode": "B",
       "selectedAt": "2026/10/4 15:46:23",
       "nameZh": "与Claude Sonnet聊天构建并部署经过测试的工作流"
+    },
+    {
+      "id": 19849,
+      "slug": "show-nasa-apod-and-nearest-asteroid-data-in-home",
+      "dir": "projects/19849-show-nasa-apod-and-nearest-asteroid-data-in-home",
+      "name": "Show NASA APOD and nearest asteroid data in Home Assistant dashboards",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/10/8 14:42:40",
+      "nameZh": "在Home Assistant仪表板中显示NASA APOD和最近小行星数据"
     }
   ]
 }
