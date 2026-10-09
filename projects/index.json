@@ -179,7 +179,11 @@
       "status": "research",
       "mode": "B",
       "selectedAt": "2026/10/8 14:42:40",
-      "nameZh": "在Home Assistant仪表板中显示NASA APOD和最近小行星数据"
+      "nameZh": "在Home Assistant仪表板中显示NASA APOD和最近小行星数据",
+      "lesson": "lesson-14",
+      "repo": "n8n-lesson-14-nasa-apod-asteroid-ha",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-14-nasa-apod-asteroid-ha/",
+      "l3At": "2026/10/9"
     }
   ]
 }
