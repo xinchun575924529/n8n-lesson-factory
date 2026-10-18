@@ -1,0 +1,726 @@
+{
+  "id": 20683,
+  "name": "Send daily AI-scored job alerts with Apify Jobs, Claude, Google Sheets, Telegram and Gmail",
+  "workflow": {
+    "id": "tyk7tgyMmDAEW7qZ",
+    "meta": {
+      "templateCredsSetupCompleted": true
+    },
+    "name": "Score daily job listings with Claude and send alerts via Telegram or Gmail",
+    "tags": [],
+    "nodes": [
+      {
+        "id": "657bd58f-5d26-4e44-9149-a8c02fd43383",
+        "name": "Overview",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          112,
+          416
+        ],
+        "parameters": {
+          "width": 424,
+          "height": 556,
+          "content": "## AI Job Matcher\nFinds new jobs every day, scores them against your profile with Claude, and sends the best ones to Telegram or Gmail.\n\n### How it works\n1. **Daily schedule** starts the run.\n2. **Apify** returns open jobs that match your search.\n3. Jobs already in your Google Sheet are dropped.\n4. **Claude** scores the new jobs 0-10. The top N are sent and logged.\n\n### Setup\n- [ ] Add credentials: Apify, Anthropic, Google Sheets, and Telegram and/or Gmail\n- [ ] Create a sheet tab `Jobs` with this header row: id, title, company, location, applyUrl, score, reason, sent, status, loggedAt\n- [ ] Fill in **Search Settings**\n- [ ] Run once, then activate\n\n### Customization tips\nChange the run time, topN, the spend cap or the Claude model in **Search Settings**."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "33f75c19-6dff-4f7d-9c67-e2caf86e837a",
+        "name": "Section 1: Schedule and fetch",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          560,
+          416
+        ],
+        "parameters": {
+          "color": 7,
+          "width": 660,
+          "height": 556,
+          "content": "## 1. Schedule and fetch\nRuns daily and pulls open jobs from Apify."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "b2a0252a-79ac-4551-99bd-776f09001c98",
+        "name": "Section 2: Keep only new jobs",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          1232,
+          416
+        ],
+        "parameters": {
+          "color": 7,
+          "width": 720,
+          "height": 556,
+          "content": "## 2. Keep only new jobs\nDrops jobs already in your sheet."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "38ac5e42-c54e-4264-9f85-18dcc4542b57",
+        "name": "Section 3: Score and log",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          1968,
+          416
+        ],
+        "parameters": {
+          "color": 7,
+          "width": 736,
+          "height": 556,
+          "content": "## 3. Score and log\nClaude scores the rest. No new jobs sends a short note."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "70d07c28-3486-4ea4-84b2-3f2f0eac5ff4",
+        "name": "Section 4: Send alerts",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          2720,
+          416
+        ],
+        "parameters": {
+          "color": 7,
+          "width": 480,
+          "height": 556,
+          "content": "## 4. Send alerts (optional)\nEach channel has an on/off switch."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "a758b2b9-a109-4f6f-a573-1f7bf8def5e2",
+        "name": "Warning: fill in Search Settings",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          768,
+          544
+        ],
+        "parameters": {
+          "color": 3,
+          "width": 228,
+          "height": 244,
+          "content": "**Fill this in first**\nKeywords, profile, sheet ID and chat ID or email."
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "12cf73bd-6416-4c85-9a27-b7d20e64ecc2",
+        "name": "Daily Schedule",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "position": [
+          592,
+          624
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 9
+              }
+            ]
+          }
+        },
+        "typeVersion": 1.2
+      },
+      {
+        "id": "d4f26627-f49f-401a-9064-ee21992561b2",
+        "name": "Search Settings",
+        "type": "n8n-nodes-base.set",
+        "position": [
+          832,
+          624
+        ],
+        "parameters": {
+          "options": {},
+          "assignments": {
+            "assignments": [
+              {
+                "id": "c1",
+                "name": "keywords",
+                "type": "string",
+                "value": "software engineer"
+              },
+              {
+                "id": "c2",
+                "name": "countries",
+                "type": "array",
+                "value": "=[\"India\"]"
+              },
+              {
+                "id": "c3",
+                "name": "city",
+                "type": "array",
+                "value": "=[]"
+              },
+              {
+                "id": "c4",
+                "name": "workModes",
+                "type": "array",
+                "value": "=[]"
+              },
+              {
+                "id": "c5",
+                "name": "maxItems",
+                "type": "number",
+                "value": 20
+              },
+              {
+                "id": "c6",
+                "name": "maxSpendUsd",
+                "type": "number",
+                "value": 1
+              },
+              {
+                "id": "c7",
+                "name": "sendTelegram",
+                "type": "boolean",
+                "value": true
+              },
+              {
+                "id": "c8",
+                "name": "telegramChatId",
+                "type": "string",
+                "value": "YOUR_TELEGRAM_CHAT_ID"
+              },
+              {
+                "id": "c9",
+                "name": "sendGmail",
+                "type": "boolean",
+                "value": false
+              },
+              {
+                "id": "c10",
+                "name": "gmailTo",
+                "type": "string",
+                "value": "user@example.com"
+              },
+              {
+                "id": "c11",
+                "name": "profile",
+                "type": "string",
+                "value": "YOUR_PROFILE: paste your resume summary / skills / target roles / seniority / preferred locations here"
+              },
+              {
+                "id": "c12",
+                "name": "topN",
+                "type": "number",
+                "value": 5
+              },
+              {
+                "id": "c13",
+                "name": "claudeModel",
+                "type": "string",
+                "value": "claude-haiku-4-5-20251001"
+              },
+              {
+                "id": "c14",
+                "name": "sheetId",
+                "type": "string",
+                "value": "YOUR_GOOGLE_SHEET_ID"
+              }
+            ]
+          }
+        },
+        "typeVersion": 3.4
+      },
+      {
+        "id": "a023823a-caed-4bef-be2f-1d41bc56e001",
+        "name": "Fetch Jobs",
+        "type": "n8n-nodes-base.httpRequest",
+        "position": [
+          1072,
+          624
+        ],
+        "parameters": {
+          "url": "https://api.apify.com/v2/acts/pk07007~ats-jobs-api/run-sync-get-dataset-items",
+          "method": "POST",
+          "options": {
+            "timeout": 120000
+          },
+          "jsonBody": "={{ JSON.stringify({ keywords: $('Search Settings').first().json.keywords, countries: $('Search Settings').first().json.countries, city: $('Search Settings').first().json.city, workModes: $('Search Settings').first().json.workModes, maxItems: $('Search Settings').first().json.maxItems, postedAfter: $now.minus({ days: 1 }).toFormat('yyyy-MM-dd') }) }}",
+          "sendBody": true,
+          "sendQuery": true,
+          "specifyBody": "json",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "maxTotalChargeUsd",
+                "value": "={{ $('Search Settings').first().json.maxSpendUsd }}"
+              }
+            ]
+          }
+        },
+        "typeVersion": 4.2,
+        "alwaysOutputData": true
+      },
+      {
+        "id": "106f0ed9-8e02-4c0d-85f8-deb059b3487f",
+        "name": "Get Seen IDs",
+        "type": "n8n-nodes-base.googleSheets",
+        "maxTries": 3,
+        "position": [
+          1312,
+          624
+        ],
+        "parameters": {
+          "options": {},
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Jobs",
+            "cachedResultName": "Jobs"
+          },
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $('Search Settings').first().json.sheetId }}",
+            "cachedResultName": "Job tracker spreadsheet"
+          }
+        },
+        "retryOnFail": true,
+        "typeVersion": 4.5,
+        "alwaysOutputData": true,
+        "waitBetweenTries": 2000
+      },
+      {
+        "id": "f2811b64-1af1-4ae3-9119-48399866f331",
+        "name": "Filter & Prep",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          1552,
+          624
+        ],
+        "parameters": {
+          "jsCode": "const cfg = $('Search Settings').first().json;\nconst seen = new Set($('Get Seen IDs').all().map(i => String(i.json.id || '')).filter(Boolean));\nconst fetched = $('Fetch Jobs').all().map(i => i.json).filter(j => j && j.id);\nconst jobs = [];\nconst ids = new Set();\nfor (const j of fetched) {\n  const id = String(j.id);\n  if (seen.has(id) || ids.has(id)) continue;\n  ids.add(id);\n  jobs.push({ id, title: j.title, company: j.company, location: j.city || j.country || 'Remote', applyUrl: j.applyUrl });\n}\nconst list = jobs.map(j => j.id + ' | ' + j.title + ' | ' + j.company + ' | ' + j.location).join('\\n');\nconst prompt = 'You rate job fit. Candidate profile:\\n' + cfg.profile + '\\n\\nFor each job below (format: id | title | company | location) give an integer score 0-10 for how well it fits the candidate, and a reason of at most 12 words. Only title, company and location are known, so judge on those. Reply with ONLY a JSON array like [{\"id\":\"...\",\"score\":7,\"reason\":\"...\"}], one entry per job, no other text.\\n\\nJobs:\\n' + list;\nreturn [{ json: { jobs, count: jobs.length, prompt, model: cfg.claudeModel, keywords: cfg.keywords, topN: cfg.topN } }];"
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "eb89b402-aeec-4e15-ad11-2878c8f6862c",
+        "name": "Any New Jobs?",
+        "type": "n8n-nodes-base.if",
+        "position": [
+          1792,
+          624
+        ],
+        "parameters": {
+          "options": {},
+          "conditions": {
+            "options": {
+              "version": 1,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "n1",
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                },
+                "leftValue": "={{ $json.count }}",
+                "rightValue": 0
+              }
+            ]
+          }
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "8a5723d3-6171-448b-8555-de315835b0ed",
+        "name": "Score with Claude",
+        "type": "n8n-nodes-base.httpRequest",
+        "maxTries": 3,
+        "position": [
+          2080,
+          528
+        ],
+        "parameters": {
+          "url": "https://api.anthropic.com/v1/messages",
+          "method": "POST",
+          "options": {
+            "timeout": 120000
+          },
+          "jsonBody": "={{ JSON.stringify({ model: $json.model, max_tokens: 4096, messages: [{ role: 'user', content: $json.prompt }] }) }}",
+          "sendBody": true,
+          "sendHeaders": true,
+          "specifyBody": "json",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "anthropic-version",
+                "value": "2023-06-01"
+              }
+            ]
+          }
+        },
+        "retryOnFail": true,
+        "typeVersion": 4.2,
+        "waitBetweenTries": 2000
+      },
+      {
+        "id": "9bbe2c52-04d0-4270-9a65-a44cfc565b32",
+        "name": "Merge Scores",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          2272,
+          528
+        ],
+        "parameters": {
+          "jsCode": "const prep = $('Filter & Prep').first().json;\nconst scores = {};\ntry {\n  const txt = $json.content[0].text;\n  const arr = JSON.parse(txt.match(/[[sS]*]/)[0]);\n  for (const s of arr) scores[String(s.id)] = { score: Number(s.score), reason: String(s.reason || '') };\n} catch (e) {}\nconst now = new Date().toISOString();\n// Keep only jobs Claude actually scored. Unscored jobs are not logged, so they are retried on the next run.\nconst rows = prep.jobs\n  .filter(j => scores[j.id] && !isNaN(scores[j.id].score))\n  .map(j => ({ ...j, score: scores[j.id].score, reason: scores[j.id].reason }));\nif (!rows.length) throw new Error('Claude returned no readable scores. Check the Score with Claude node output; nothing was logged, so these jobs will be retried on the next run.');\nrows.sort((a, b) => b.score - a.score);\nconst topN = Number(prep.topN) || 5;\nreturn rows.map((r, i) => ({ json: { ...r, sent: i < topN, status: '', loggedAt: now, keywords: prep.keywords, total: rows.length } }));"
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "bc0326aa-e4ef-44db-b877-83a63bf4bc26",
+        "name": "Build Message",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          2464,
+          528
+        ],
+        "parameters": {
+          "jsCode": "const rows = $('Merge Scores').all().map(i => i.json).filter(r => r.sent);\nconst total = rows.length ? rows[0].total : 0;\nconst label = rows.length ? (rows[0].keywords || 'all jobs') : 'all jobs';\nconst esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst sc = r => (r.score === '' ? '?' : r.score) + '/10';\nconst header = 'Top ' + rows.length + ' of ' + total + ' new job(s) for \"' + label + '\":\\n\\n';\nconst lines = rows.map(r => '• [' + sc(r) + '] ' + r.title + ' @ ' + r.company + ' (' + r.location + ')\\n' + r.reason + '\\n' + r.applyUrl);\nlet out = header;\nlet shown = 0;\nfor (const l of lines) {\n  if ((out + l + '\\n\\n').length > 3900) break;\n  out += l + '\\n\\n';\n  shown++;\n}\nconst text = shown < lines.length ? out.trimEnd() + '\\n\\n+' + (lines.length - shown) + ' more' : out.trimEnd();\nconst html = '<h3>Top ' + rows.length + ' of ' + total + ' new job(s) for \"' + esc(label) + '\"</h3><ul>' +\n  rows.map(r => '<li><b>[' + sc(r) + ']</b> <a href=\"' + esc(r.applyUrl) + '\">' + esc(r.title) + '</a> @ ' + esc(r.company) + ' (' + esc(r.location) + ')<br>' + esc(r.reason) + '</li>').join('') + '</ul>';\nreturn [{ json: { text, html, subject: 'Job alert: ' + label, count: rows.length } }];"
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "959e2a5d-4891-41ab-8657-b18f859ce5c8",
+        "name": "Log to Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "onError": "continueRegularOutput",
+        "position": [
+          2512,
+          784
+        ],
+        "parameters": {
+          "columns": {
+            "value": {
+              "id": "={{ $json.id }}",
+              "sent": "={{ $json.sent }}",
+              "score": "={{ $json.score }}",
+              "title": "={{ $json.title }}",
+              "reason": "={{ $json.reason }}",
+              "status": "={{ $json.status }}",
+              "company": "={{ $json.company }}",
+              "applyUrl": "={{ $json.applyUrl }}",
+              "location": "={{ $json.location }}",
+              "loggedAt": "={{ $json.loggedAt }}"
+            },
+            "schema": [],
+            "mappingMode": "defineBelow",
+            "matchingColumns": []
+          },
+          "options": {
+            "cellFormat": "USER_ENTERED"
+          },
+          "operation": "append",
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Jobs",
+            "cachedResultName": "Jobs"
+          },
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "={{ $('Search Settings').first().json.sheetId }}",
+            "cachedResultName": "Job tracker spreadsheet"
+          }
+        },
+        "typeVersion": 4.5
+      },
+      {
+        "id": "cb8aa8d9-b4f5-45b9-9309-41eeb1c312a6",
+        "name": "No New Jobs Message",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          2080,
+          800
+        ],
+        "parameters": {
+          "jsCode": "const label = $('Filter & Prep').first().json.keywords || 'all jobs';\nconst text = 'No new jobs today for \"' + label + '\".';\nreturn [{ json: { text, html: '<p>' + text.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</p>', subject: 'Job alert: ' + label, count: 0 } }];"
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "4f2b88c6-d3f0-4669-a2af-c7ef068981e8",
+        "name": "Telegram Enabled?",
+        "type": "n8n-nodes-base.if",
+        "position": [
+          2784,
+          544
+        ],
+        "parameters": {
+          "options": {},
+          "conditions": {
+            "options": {
+              "version": 1,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "d1",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                },
+                "leftValue": "={{ $('Search Settings').first().json.sendTelegram }}",
+                "rightValue": true
+              }
+            ]
+          }
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "dc248107-fab7-4ec9-8966-6d07518af087",
+        "name": "Send Telegram",
+        "type": "n8n-nodes-base.telegram",
+        "maxTries": 3,
+        "position": [
+          3008,
+          512
+        ],
+        "webhookId": "de90be85-3b76-4a3b-8756-f7e8b5604375",
+        "parameters": {
+          "text": "={{ $json.text }}",
+          "chatId": "={{ $('Search Settings').first().json.telegramChatId }}",
+          "additionalFields": {}
+        },
+        "retryOnFail": true,
+        "typeVersion": 1.2,
+        "waitBetweenTries": 2000
+      },
+      {
+        "id": "dc74d048-1324-4345-be82-a8db2e0ae376",
+        "name": "Gmail Enabled?",
+        "type": "n8n-nodes-base.if",
+        "position": [
+          2784,
+          688
+        ],
+        "parameters": {
+          "options": {},
+          "conditions": {
+            "options": {
+              "version": 1,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "e1",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                },
+                "leftValue": "={{ $('Search Settings').first().json.sendGmail }}",
+                "rightValue": true
+              }
+            ]
+          }
+        },
+        "typeVersion": 2
+      },
+      {
+        "id": "5a6b3b51-01b6-4e4f-8774-efa6a59b5b7f",
+        "name": "Send Gmail",
+        "type": "n8n-nodes-base.gmail",
+        "maxTries": 3,
+        "position": [
+          3008,
+          672
+        ],
+        "webhookId": "034ee1d0-bf78-4793-b43f-33965397ecb3",
+        "parameters": {
+          "sendTo": "={{ $('Search Settings').first().json.gmailTo }}",
+          "message": "={{ $json.html }}",
+          "options": {},
+          "subject": "={{ $json.subject }}"
+        },
+        "retryOnFail": true,
+        "typeVersion": 2.1,
+        "waitBetweenTries": 2000
+      }
+    ],
+    "active": false,
+    "pinData": {},
+    "settings": {
+      "binaryMode": "separate",
+      "executionOrder": "v1"
+    },
+    "versionId": "b329b25f-eeca-457e-a72c-28d197130a7c",
+    "nodeGroups": [],
+    "connections": {
+      "Fetch Jobs": {
+        "main": [
+          [
+            {
+              "node": "Get Seen IDs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Seen IDs": {
+        "main": [
+          [
+            {
+              "node": "Filter & Prep",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge Scores": {
+        "main": [
+          [
+            {
+              "node": "Build Message",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Log to Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Any New Jobs?": {
+        "main": [
+          [
+            {
+              "node": "Score with Claude",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "No New Jobs Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Message": {
+        "main": [
+          [
+            {
+              "node": "Telegram Enabled?",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Gmail Enabled?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter & Prep": {
+        "main": [
+          [
+            {
+              "node": "Any New Jobs?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Daily Schedule": {
+        "main": [
+          [
+            {
+              "node": "Search Settings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail Enabled?": {
+        "main": [
+          [
+            {
+              "node": "Send Gmail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Search Settings": {
+        "main": [
+          [
+            {
+              "node": "Fetch Jobs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Score with Claude": {
+        "main": [
+          [
+            {
+              "node": "Merge Scores",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram Enabled?": {
+        "main": [
+          [
+            {
+              "node": "Send Telegram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "No New Jobs Message": {
+        "main": [
+          [
+            {
+              "node": "Telegram Enabled?",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Gmail Enabled?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    }
+  }
+}
