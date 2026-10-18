@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-13 18:30:04",
+  "updatedAt": "2026-10-18 14:25:29",
   "projects": [
     {
       "id": 8965,
@@ -190,6 +190,16 @@
       "mode": "B",
       "selectedAt": "2026/10/13 18:29:00",
       "nameZh": "通过webhook协调HR、IAM、IT和SaaS的员工入职流程"
+    },
+    {
+      "id": 20683,
+      "slug": "send-daily-ai-scored-job-alerts-with-apify-jobs",
+      "dir": "projects/20683-send-daily-ai-scored-job-alerts-with-apify-jobs",
+      "name": "Send daily AI-scored job alerts with Apify Jobs, Claude, Google Sheets, Telegram and Gmail",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/10/18 14:18:40",
+      "nameZh": "每日AI评分职位提醒：Apify Jobs、Claude、Google Sheets、Telegram和Gmail"
     }
   ]
 }
