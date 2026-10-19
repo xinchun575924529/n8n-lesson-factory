@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-18 14:25:29",
+  "updatedAt": "2026-10-19 19:58:54",
   "projects": [
     {
       "id": 8965,
@@ -200,6 +200,16 @@
       "mode": "B",
       "selectedAt": "2026/10/18 14:18:40",
       "nameZh": "每日AI评分职位提醒：Apify Jobs、Claude、Google Sheets、Telegram和Gmail"
+    },
+    {
+      "id": 8416,
+      "slug": "register-zoom-webinar-attendees-from-klicktipp-l",
+      "dir": "projects/8416-register-zoom-webinar-attendees-from-klicktipp-l",
+      "name": "Register Zoom webinar attendees from KlickTipp landing page forms",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/10/19 19:56:00",
+      "nameZh": "从KlickTipp落地页表单注册Zoom网络研讨会参会者"
     }
   ]
 }
