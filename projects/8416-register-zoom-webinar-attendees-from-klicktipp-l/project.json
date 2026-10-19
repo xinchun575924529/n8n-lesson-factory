@@ -1,0 +1,34 @@
+{
+  "id": 8416,
+  "slug": "register-zoom-webinar-attendees-from-klicktipp-l",
+  "dir": "projects/8416-register-zoom-webinar-attendees-from-klicktipp-l",
+  "name": "Register Zoom webinar attendees from KlickTipp landing page forms",
+  "url": "https://n8n.io/workflows/8416/",
+  "views": 192,
+  "recent": 192,
+  "nodeCount": 3,
+  "nodeTypes": [
+    "httpRequest",
+    "switch",
+    "stickyNote"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/10/19 19:56:00",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/10/19 19:56:00",
+  "updatedAt": "2026/10/19 19:56:00",
+  "history": [
+    {
+      "at": "2026/10/19 19:56:00",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/8416-register-zoom-webinar-attendees-from-klicktipp-l"
+  },
+  "nameZh": "从KlickTipp落地页表单注册Zoom网络研讨会参会者"
+}
