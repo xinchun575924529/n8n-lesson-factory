@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19 19:58:59",
+  "updatedAt": "2026-10-19 20:28:55",
   "projects": [
     {
       "id": 8965,
@@ -211,6 +211,16 @@
       "mode": "B",
       "selectedAt": "2026/10/19 19:56:00",
       "nameZh": "从KlickTipp落地页表单注册Zoom网络研讨会参会者"
+    },
+    {
+      "id": 20847,
+      "slug": "plan-weekly-seo-content-from-google-trends-and-n",
+      "dir": "projects/20847-plan-weekly-seo-content-from-google-trends-and-n",
+      "name": "Plan weekly SEO content from Google Trends and news with Apify, OpenAI and Google Sheets",
+      "status": "backlog",
+      "mode": "A",
+      "selectedAt": "2026/10/19 20:26:00",
+      "nameZh": "用Apify、OpenAI和Google Sheets根据Google Trends和新闻规划每周SEO内容"
     }
   ]
 }
