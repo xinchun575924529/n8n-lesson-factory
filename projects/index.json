@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19 19:58:54",
+  "updatedAt": "2026-10-19 19:58:59",
   "projects": [
     {
       "id": 8965,
@@ -7,9 +7,10 @@
       "dir": "projects/8965-generate-and-publish-social-posts-with-gemini-ki",
       "name": "Generate and publish social posts with Gemini, Kie.ai, and Zernio API",
       "nameZh": "用 Gemini+Kie.ai+Zernio 自动生成并发布社媒帖子",
-      "status": "backlog",
+      "status": "research",
       "mode": "A",
-      "selectedAt": "2026/9/8 06:10:19"
+      "selectedAt": "2026/9/8 06:10:19",
+      "researchStartedAt": "2026-10-19 19:58:59"
     },
     {
       "id": 17522,
