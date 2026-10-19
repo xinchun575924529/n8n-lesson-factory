@@ -1,0 +1,39 @@
+{
+  "id": 20847,
+  "slug": "plan-weekly-seo-content-from-google-trends-and-n",
+  "dir": "projects/20847-plan-weekly-seo-content-from-google-trends-and-n",
+  "name": "Plan weekly SEO content from Google Trends and news with Apify, OpenAI and Google Sheets",
+  "url": "https://n8n.io/workflows/20847/",
+  "views": 32,
+  "recent": 9,
+  "nodeCount": 15,
+  "nodeTypes": [
+    "googleSheets",
+    "httpRequest",
+    "if",
+    "noOp",
+    "set",
+    "gmail",
+    "stickyNote",
+    "code"
+  ],
+  "selection": {
+    "mode": "A",
+    "at": "2026/10/19 20:26:00",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "backlog",
+  "createdAt": "2026/10/19 20:26:00",
+  "updatedAt": "2026/10/19 20:26:00",
+  "history": [
+    {
+      "at": "2026/10/19 20:26:00",
+      "event": "selected",
+      "mode": "A"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/20847-plan-weekly-seo-content-from-google-trends-and-n"
+  },
+  "nameZh": "用Apify、OpenAI和Google Sheets根据Google Trends和新闻规划每周SEO内容"
+}
