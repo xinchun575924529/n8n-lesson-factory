@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20 11:00:00",
+  "updatedAt": "2026-10-20 15:50:00",
   "projects": [
     {
       "id": 8965,
@@ -201,8 +201,8 @@
       "mode": "B",
       "selectedAt": "2026/10/18 14:18:40",
       "nameZh": "每日AI评分职位提醒：Apify Jobs、Claude、Google Sheets、Telegram和Gmail",
-      "site": "https://xinchun575924529.github.io/n8n-lesson-16-ai-job-alerts/",
-      "repo": "n8n-lesson-16-ai-job-alerts"
+      "site": "https://xinchun575924529.github.io/n8n-lesson-17-ai-job-alerts/",
+      "repo": "n8n-lesson-17-ai-job-alerts"
     },
     {
       "id": 8416,
