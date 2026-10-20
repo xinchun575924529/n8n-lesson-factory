@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19 20:28:55",
+  "updatedAt": "2026-10-20 10:54:54",
   "projects": [
     {
       "id": 8965,
@@ -210,7 +210,9 @@
       "status": "research",
       "mode": "B",
       "selectedAt": "2026/10/19 19:56:00",
-      "nameZh": "从KlickTipp落地页表单注册Zoom网络研讨会参会者"
+      "nameZh": "从KlickTipp落地页表单注册Zoom网络研讨会参会者",
+      "site": "https://xinchun575924529.github.io/n8n-lesson-16-zoom-webinar-funnel/",
+      "repo": "n8n-lesson-16-zoom-webinar-funnel"
     },
     {
       "id": 20847,
