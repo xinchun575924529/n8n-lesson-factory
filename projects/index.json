@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22 08:50:52",
+  "updatedAt": "2026-10-22 08:56:00",
   "projects": [
     {
       "id": 8965,
@@ -256,6 +256,16 @@
       "selectedAt": "2026-09-30",
       "nameZh": "Udemy 英文课上架线（首门=lesson-10 每日AI市场简报）",
       "repo": "udemy-lesson-10-en"
+    },
+    {
+      "id": "90004",
+      "slug": "drama-cloud-migration",
+      "dir": "projects/90004-drama-cloud-migration",
+      "name": "AI short-drama production pipeline on cloud (script to storyboard to i2v to TTS to compose)",
+      "nameZh": "AI短剧产线上云·涅槃（剧本→分镜→图生视频→配音→合成全自动产线）",
+      "status": "paused",
+      "mode": "B",
+      "selectedAt": "2026/10/9 01:13:00"
     }
   ]
 }
