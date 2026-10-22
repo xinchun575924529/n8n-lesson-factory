@@ -1,0 +1,28 @@
+{
+  "id": "90005",
+  "slug": "lesson-pipeline-cn-en-split",
+  "name": "Lesson pipeline CN/EN split (EN line independent under 90003, CN cloud migration cancelled)",
+  "nameZh": "教案产线中英拆分（英文线独立落地，中文线上云取消，军军出局）",
+  "mode": "internal",
+  "status": "done",
+  "selectedAt": "2026/10/11 08:00:00",
+  "site": null,
+  "repo": null,
+  "history": [
+    {
+      "ts": "2026-10-11",
+      "event": "selected",
+      "note": "老板立项：教案产线中英拆分，英文线独立运营"
+    },
+    {
+      "ts": "2026-10-11",
+      "event": "decisions",
+      "note": "老板三连修订：①中文线上云取消（07:52「暂时不做」）②军军出局（07:51「他上项目研发可能有问题」）③英文线独立落地：专属群【教案制作组·英文线】oc_562340864bcc855d2ef69525b697caf1（群主=老板）+专属会话「研发·90003-英文教案线」；早前中文线群 oc_b932cdebca94cb5729534791c3f95a7d 闲置留废。铁律：不做任何产权/群主/账号归属变更"
+    },
+    {
+      "ts": "2026-10-22",
+      "event": "index-registration-backfill",
+      "note": "补办登记进 GitHub 工厂 index（原「已登记」记忆不实，主会话核实后补登）"
+    }
+  ]
+}
