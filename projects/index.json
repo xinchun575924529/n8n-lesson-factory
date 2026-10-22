@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22 08:45:00",
+  "updatedAt": "2026-10-22 08:50:52",
   "projects": [
     {
       "id": 8965,
@@ -245,6 +245,17 @@
       "status": "research",
       "mode": "A",
       "selectedAt": "2026/9/23 20:25:00"
+    },
+    {
+      "id": "90003",
+      "slug": "udemy-english-course-line",
+      "dir": "projects/90003-udemy-english-course-line",
+      "name": "Udemy English course publishing line (first: AI Market Briefing Automation with n8n)",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026-09-30",
+      "nameZh": "Udemy 英文课上架线（首门=lesson-10 每日AI市场简报）",
+      "repo": "udemy-lesson-10-en"
     }
   ]
 }
