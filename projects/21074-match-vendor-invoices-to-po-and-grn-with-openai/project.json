@@ -1,0 +1,39 @@
+{
+  "id": 21074,
+  "slug": "match-vendor-invoices-to-po-and-grn-with-openai",
+  "dir": "projects/21074-match-vendor-invoices-to-po-and-grn-with-openai",
+  "name": "Match vendor invoices to PO and GRN with OpenAI, Gmail, Sheets and Slack",
+  "url": "https://n8n.io/workflows/21074/",
+  "views": 13,
+  "recent": 65,
+  "nodeCount": 15,
+  "nodeTypes": [
+    "googleSheets",
+    "httpRequest",
+    "if",
+    "slack",
+    "webhook",
+    "googleDrive",
+    "switch",
+    "gmail"
+  ],
+  "selection": {
+    "mode": "A",
+    "at": "2026/10/23 06:33:20",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "backlog",
+  "createdAt": "2026/10/23 06:33:20",
+  "updatedAt": "2026/10/23 06:33:20",
+  "history": [
+    {
+      "at": "2026/10/23 06:33:20",
+      "event": "selected",
+      "mode": "A"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/21074-match-vendor-invoices-to-po-and-grn-with-openai"
+  },
+  "nameZh": "用OpenAI、Gmail、Sheets和Slack将供应商发票与PO和GRN匹配"
+}
