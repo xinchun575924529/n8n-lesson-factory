@@ -1,0 +1,55 @@
+{
+  "id": "90004",
+  "slug": "drama-cloud-migration",
+  "dir": "projects/90004-drama-cloud-migration",
+  "name": "AI short-drama production pipeline on cloud (script to storyboard to i2v to TTS to compose)",
+  "url": "",
+  "views": null,
+  "recent": null,
+  "nodeCount": null,
+  "nodeTypes": [
+    "httpRequest",
+    "ssh",
+    "code",
+    "executeCommand",
+    "scheduleTrigger"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/10/9 01:13:00",
+    "by": "boss-webchat"
+  },
+  "status": "paused",
+  "createdAt": "2026/10/9 01:13:00",
+  "updatedAt": "2026-10-22 08:56:00",
+  "history": [
+    {
+      "at": "2026/10/9 01:13:00",
+      "event": "selected",
+      "mode": "B",
+      "note": "老板派单立项：AI短剧产线上云（涅槃），AutoDL GPU + ECS 编排，立项即研发"
+    },
+    {
+      "at": "2026-10-17 12:41:00",
+      "event": "milestone",
+      "note": "EP01 全链验收成片 83.5s（21/21镜头 Wan2.2 i2v + edge-tts 真人配音 + 字幕BGM 合成）"
+    },
+    {
+      "at": "2026-10-19 16:45:00",
+      "event": "paused",
+      "by": "boss-webchat",
+      "note": "老板拍板暂停：成片无口型（Wan2.2 i2v 不含 lip-sync）+ 立项到出片耗时 8 天；资产封存 ECS /root/drama-niepan/，AutoDL 双实例已关机止血"
+    },
+    {
+      "at": "2026-10-22 08:56:00",
+      "event": "registered",
+      "note": "补办登记进 GitHub 工厂 index（老板 2026-10-22 指令；此前漏登）"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/90004-drama-cloud-migration"
+  },
+  "nameZh": "AI短剧产线上云·涅槃（剧本→分镜→图生视频→配音→合成全自动产线）",
+  "origin": "internal",
+  "originNote": "自有短剧产线上云；非 n8n 模板。对话发起项目 9 开头编号。重启钥匙=加 lip-sync 环节（Wav2Lip/SadTalker/latentsync）。"
+}
