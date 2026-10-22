@@ -225,6 +225,16 @@
       "mode": "A",
       "selectedAt": "2026/10/19 20:26:00",
       "nameZh": "用Apify、OpenAI和Google Sheets根据Google Trends和新闻规划每周SEO内容"
+    },
+    {
+      "id": "90006",
+      "slug": "src-vuln-management-pipeline",
+      "dir": "projects/90006-src-vuln-management-pipeline",
+      "name": "SRC vulnerability management pipeline (self-use MVP)",
+      "nameZh": "SRC漏洞管理流水线（自用MVP，非课程）",
+      "status": "research",
+      "mode": "internal",
+      "selectedAt": "2026-10-21 17:53:00"
     }
   ]
 }
