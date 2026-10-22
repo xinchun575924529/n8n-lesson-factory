@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22 09:11:47",
+  "updatedAt": "2026-10-23 06:40:48",
   "projects": [
     {
       "id": 8965,
@@ -276,6 +276,16 @@
       "status": "done",
       "mode": "internal",
       "selectedAt": "2026/10/11 08:00:00"
+    },
+    {
+      "id": 21074,
+      "slug": "match-vendor-invoices-to-po-and-grn-with-openai",
+      "dir": "projects/21074-match-vendor-invoices-to-po-and-grn-with-openai",
+      "name": "Match vendor invoices to PO and GRN with OpenAI, Gmail, Sheets and Slack",
+      "status": "backlog",
+      "mode": "A",
+      "selectedAt": "2026/10/23 06:33:20",
+      "nameZh": "用OpenAI、Gmail、Sheets和Slack将供应商发票与PO和GRN匹配"
     }
   ]
 }
