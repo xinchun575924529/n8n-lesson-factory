@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-20 15:50:00",
+  "updatedAt": "2026-10-22 08:45:00",
   "projects": [
     {
       "id": 8965,
@@ -235,6 +235,16 @@
       "status": "research",
       "mode": "internal",
       "selectedAt": "2026-10-21 17:53:00"
+    },
+    {
+      "id": "90001",
+      "slug": "daily-sv-vertical-columns",
+      "dir": "projects/90001-daily-sv-vertical-columns",
+      "name": "Daily-SV Vertical Columns (AI short-video daily pipeline, customizable by student-chosen content column)",
+      "nameZh": "AI短视频日更流水线·专栏定制版（学员按体育新闻等专栏定制选题推荐）",
+      "status": "research",
+      "mode": "A",
+      "selectedAt": "2026/9/23 20:25:00"
     }
   ]
 }
