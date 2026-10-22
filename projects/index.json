@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-22 08:56:00",
+  "updatedAt": "2026-10-22 09:11:47",
   "projects": [
     {
       "id": 8965,
@@ -266,6 +266,16 @@
       "status": "paused",
       "mode": "B",
       "selectedAt": "2026/10/9 01:13:00"
+    },
+    {
+      "id": "90005",
+      "slug": "lesson-pipeline-cn-en-split",
+      "dir": "projects/90005-lesson-pipeline-cn-en-split",
+      "name": "Lesson pipeline CN/EN split (EN line independent under 90003, CN cloud migration cancelled)",
+      "nameZh": "教案产线中英拆分（英文线独立落地，中文线上云取消，军军出局）",
+      "status": "done",
+      "mode": "internal",
+      "selectedAt": "2026/10/11 08:00:00"
     }
   ]
 }
