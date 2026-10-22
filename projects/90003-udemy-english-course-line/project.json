@@ -1,0 +1,35 @@
+{
+  "id": "90003",
+  "slug": "udemy-english-course-line",
+  "dir": "projects/90003-udemy-english-course-line",
+  "name": "Udemy English course publishing line (first: AI Market Briefing Automation with n8n)",
+  "url": "",
+  "views": null,
+  "recent": null,
+  "nodeCount": null,
+  "nodeTypes": [],
+  "selection": {
+    "mode": "B",
+    "at": "2026-09-30",
+    "by": "boss-webchat"
+  },
+  "status": "research",
+  "createdAt": "2026-09-30",
+  "updatedAt": "2026-10-22 08:50:52",
+  "history": [
+    {
+      "at": "2026-09-30",
+      "event": "selected",
+      "mode": "B"
+    },
+    {
+      "at": "2026-10-22 08:50:52",
+      "event": "index-registration-backfill"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/90003-udemy-english-course-line"
+  },
+  "nameZh": "Udemy 英文课上架线（首门=lesson-10 每日AI市场简报）",
+  "repo": "udemy-lesson-10-en"
+}
