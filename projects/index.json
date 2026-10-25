@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-23 06:40:48",
+  "updatedAt": "2026-10-25 10:49:23",
   "projects": [
     {
       "id": 8965,
@@ -286,6 +286,16 @@
       "mode": "A",
       "selectedAt": "2026/10/23 06:33:20",
       "nameZh": "用OpenAI、Gmail、Sheets和Slack将供应商发票与PO和GRN匹配"
+    },
+    {
+      "id": 21388,
+      "slug": "create-ugc-style-instagram-reels-from-product-ur",
+      "dir": "projects/21388-create-ugc-style-instagram-reels-from-product-ur",
+      "name": "Create UGC-style Instagram Reels from product URLs with OpenAI, Sisif, and Slack",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/10/25 10:45:37",
+      "nameZh": "用OpenAI、Sisif和Slack从产品URL创建UGC风格Instagram Reels"
     }
   ]
 }
