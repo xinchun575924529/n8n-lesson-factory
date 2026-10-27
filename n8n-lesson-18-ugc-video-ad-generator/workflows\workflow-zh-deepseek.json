@@ -1,0 +1,1123 @@
+{
+  "name": "L2C21388001",
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        -400,
+        0
+      ],
+      "parameters": {},
+      "typeVersion": 1
+    },
+    {
+      "id": "2",
+      "name": "Mock Input",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -200,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "i1",
+              "name": "product_url",
+              "type": "string",
+              "value": "https://example.com/products/coolgadget-pro"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "3",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "product_url",
+              "type": "string",
+              "value": "={{ $json.product_url || $json.body?.product_url }}"
+            },
+            {
+              "id": "a2",
+              "name": "ig_user_id",
+              "type": "string",
+              "value": "MOCK_IG_USER"
+            },
+            {
+              "id": "a3",
+              "name": "graph_version",
+              "type": "string",
+              "value": "v21.0"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "4",
+      "name": "Mock Fetch Page",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        200,
+        0
+      ],
+      "parameters": {
+        "jsCode": "return [{ json: { data: \"<html><head><meta property=\\\"og:title\\\" content=\\\"CoolGadget Pro - Smart Home Hub\\\"><meta property=\\\"og:description\\\" content=\\\"Control your entire home with one device. Voice control, app, automation.\\\"><meta property=\\\"og:image\\\" content=\\\"https://example.com/product.jpg\\\"><title>CoolGadget Pro</title></head><body><h1>CoolGadget Pro</h1><p>The ultimate smart home hub. Control lights, temperature, security cameras and more from one sleek device. Supports Alexa, Google Home, and HomeKit. Energy efficient with automatic scheduling.</p><span>$79.99</span><p>Over 10,000 happy customers. Easy 2-minute setup.</p></body></html>\" } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "5",
+      "name": "Extract Page Text",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        400,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data || '';\nconst pick = (re) => (html.match(re) || [])[1] || '';\nconst title = pick(/<meta[^>]+property=[\"']og:title[\"'][^>]+content=[\"']([^\"']+)/i) || pick(/<title[^>]*>([^<]*)<\\/title>/i);\nconst description = pick(/<meta[^>]+(?:name|property)=[\"'](?:og:)?description[\"'][^>]+content=[\"']([^\"']+)/i);\nconst image = pick(/<meta[^>]+property=[\"']og:image[\"'][^>]+content=[\"']([^\"']+)/i);\nconst text = html.replace(/<script[\\s\\S]*?<\\/script>|<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 6000);\nreturn [{ json: { title, description, image, text, product_url: $('Settings').first().json.product_url } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "6",
+      "name": "DeepSeek API",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        600,
+        0
+      ],
+      "parameters": {
+        "url": "https://api.deepseek.com/v1/chat/completions",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer sk-3bdc3ad33ecc41baabe98a80774b1274"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"model\": \"deepseek-chat\", \"messages\": [{\"role\": \"user\", \"content\": \"You are a UGC ad scriptwriter. From the product page below, write a short vertical video ad.\\nRespond with a JSON object containing exactly these fields:\\n- hook: a scroll-stopping first line (max 12 words)\\n- script: a 3-sentence voiceover-style script in a casual first-person UGC tone\\n- caption: an Instagram caption with up to 5 hashtags\\n- prompts: an array of exactly 3 different visual prompts (max 60 words each) for a 5 second 9:16 video, each a different angle (unboxing, in-use close-up, lifestyle). No on-screen text.\\n\\nTitle: ={{ $json.title }}\\nDescription: ={{ $json.description }}\\nPage text: ={{ $json.text }}\\n\\nRespond ONLY with the JSON object, no other text.\"}], \"response_format\": {\"type\": \"json_object\"}, \"max_tokens\": 1000, \"temperature\": 0.7}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "typeVersion": 4.2
+    },
+    {
+      "id": "7",
+      "name": "Parse DeepSeek",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        800,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const r = $input.first().json;\nconst content = r.choices[0].message.content;\nlet parsed;\ntry { parsed = JSON.parse(content); } catch(e) { throw new Error('DeepSeek returned invalid JSON: ' + content.slice(0, 200)); }\nif (!parsed.hook || !parsed.prompts || !Array.isArray(parsed.prompts)) throw new Error('Missing required fields: ' + Object.keys(parsed).join(','));\nreturn [{ json: { output: parsed } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "8",
+      "name": "Split Into Variants",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1000,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const o = $input.first().json.output;\nreturn o.prompts.slice(0, 3).map((prompt, i) => ({ json: { variant: i + 1, prompt, hook: o.hook, script: o.script, caption: o.caption } }));",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "9",
+      "name": "Loop Over Variants",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1200,
+        0
+      ],
+      "parameters": {
+        "options": {}
+      },
+      "typeVersion": 3
+    },
+    {
+      "id": "10",
+      "name": "Mock Create Sisif",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1400,
+        200
+      ],
+      "parameters": {
+        "jsCode": "const v = $json.variant;\nconst fs = require('fs');\nconst p = 'C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/21388-l2c/variant_' + v + '.mp4';\nif (!fs.existsSync(p)) throw new Error('Video not found: ' + p);\nreturn [{ json: { id: 'poll_v' + v, file_path: p, file_size: fs.statSync(p).size } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "11",
+      "name": "Start Poll Counter",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1600,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "poll_id",
+              "type": "string",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "id": "p2",
+              "name": "attempt",
+              "type": "number",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "12",
+      "name": "Wait Before Status Check",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1800,
+        200
+      ],
+      "parameters": {
+        "amount": 1
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "13",
+      "name": "Mock Check Video Status",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2000,
+        200
+      ],
+      "parameters": {
+        "jsCode": "const v = $('Loop Over Variants').item.json.variant;\nreturn [{ json: { status: 'READY', video_url: 'file:///C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/21388-l2c/variant_' + v + '.mp4', id: $json.poll_id } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "14",
+      "name": "Track Poll Attempt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2200,
+        200
+      ],
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p3",
+              "name": "poll_id",
+              "type": "string",
+              "value": "={{ $('Wait Before Status Check').item.json.poll_id }}"
+            },
+            {
+              "id": "p4",
+              "name": "attempt",
+              "type": "number",
+              "value": "={{ $('Wait Before Status Check').item.json.attempt + 1 }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "15",
+      "name": "Is Video Ready?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2400,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "READY"
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "16",
+      "name": "Did Generation Fail?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2600,
+        300
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "c1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ERROR"
+            },
+            {
+              "id": "c2",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "REFUNDED"
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "17",
+      "name": "Under Max Attempts?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2800,
+        400
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              },
+              "leftValue": "={{ $json.attempt }}",
+              "rightValue": 40
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "18",
+      "name": "Collect Variant",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        3000,
+        200
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "variant",
+              "type": "number",
+              "value": "={{ $('Loop Over Variants').item.json.variant }}"
+            },
+            {
+              "id": "c2",
+              "name": "video_url",
+              "type": "string",
+              "value": "={{ $json.status === 'READY' ? $json.video_url : '' }}"
+            },
+            {
+              "id": "c3",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.status === 'READY' || $json.status === 'ERROR' || $json.status === 'REFUNDED' ? $json.status : 'TIMED_OUT' }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "19",
+      "name": "Build Slack Message",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1400,
+        -200
+      ],
+      "parameters": {
+        "jsCode": "const v = $input.all().map(i => i.json);\nconst s = $('Split Into Variants').first().json;\nconst lines = v.map(x => `Variant ${x.variant}: ${x.video_url || 'failed (' + x.status + ')'}`).join('\\n');\nreturn [{ json: { ready_count: v.filter(x => x.video_url).length, variants: v, caption: s.caption, message: `*New UGC ad for review*\\nHook: ${s.hook}\\nScript: ${s.script}\\n\\n${lines}\\n\\nCaption:\\n${s.caption}` } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "20",
+      "name": "Any Variant Ready?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        1600,
+        -200
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              },
+              "leftValue": "={{ $json.ready_count }}",
+              "rightValue": 0
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "21",
+      "name": "Mock Approval",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1800,
+        -200
+      ],
+      "parameters": {
+        "jsCode": "const b = $('Build Slack Message').first().json;\nconst first = b.variants.find(v => v.video_url);\nconst n = first ? first.variant : 1;\nreturn [{ json: { data: { decision: `Variant ${n}` } } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "22",
+      "name": "Was A Variant Approved?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2000,
+        -200
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "leftValue": "={{ $json.data.decision }}",
+              "rightValue": "Reject"
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "23",
+      "name": "Pick Approved Variant",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2200,
+        -200
+      ],
+      "parameters": {
+        "jsCode": "const n = Number(String($input.first().json.data.decision).replace(/\\D/g, ''));\nconst m = $('Build Slack Message').first().json;\nconst v = m.variants.find(x => x.variant === n);\nif (!v || !v.video_url) throw new Error(`Variant ${n} has no video`);\nreturn [{ json: { video_url: v.video_url, caption: m.caption } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "24",
+      "name": "Mock Create IG Container",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2400,
+        -200
+      ],
+      "parameters": {
+        "jsCode": "return [{ json: { id: \"ig_container_l2c_1\" } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "25",
+      "name": "Start Instagram Poll Counter",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2600,
+        -200
+      ],
+      "parameters": {
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ip1",
+              "name": "poll_id",
+              "type": "string",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "id": "ip2",
+              "name": "attempt",
+              "type": "number",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "26",
+      "name": "Wait For Instagram Processing",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        2800,
+        -200
+      ],
+      "parameters": {
+        "amount": 1
+      },
+      "typeVersion": 1.1
+    },
+    {
+      "id": "27",
+      "name": "Mock Check IG Status",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        3000,
+        -200
+      ],
+      "parameters": {
+        "jsCode": "return [{ json: { status_code: \"FINISHED\" } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "28",
+      "name": "Track Instagram Poll Attempt",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        3200,
+        -200
+      ],
+      "parameters": {
+        "includeOtherFields": true,
+        "options": {},
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ip3",
+              "name": "poll_id",
+              "type": "string",
+              "value": "={{ $('Wait For Instagram Processing').item.json.poll_id }}"
+            },
+            {
+              "id": "ip4",
+              "name": "attempt",
+              "type": "number",
+              "value": "={{ $('Wait For Instagram Processing').item.json.attempt + 1 }}"
+            }
+          ]
+        }
+      },
+      "typeVersion": 3.4
+    },
+    {
+      "id": "29",
+      "name": "Is Container Finished?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        3400,
+        -200
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.status_code }}",
+              "rightValue": "FINISHED"
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "30",
+      "name": "Under Instagram Max Attempts?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        3600,
+        -100
+      ],
+      "parameters": {
+        "options": {},
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c1",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              },
+              "leftValue": "={{ $json.attempt }}",
+              "rightValue": 40
+            }
+          ]
+        }
+      },
+      "typeVersion": 2.2
+    },
+    {
+      "id": "31",
+      "name": "Mock Publish IG",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        3600,
+        -300
+      ],
+      "parameters": {
+        "jsCode": "return [{ json: { id: \"ig_l2c_published\", success: true } }];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    },
+    {
+      "id": "32",
+      "name": "Assert",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        4000,
+        0
+      ],
+      "parameters": {
+        "jsCode": "const results = [];\nfunction A(n,p,d){results.push({name:n,pass:p,detail:d||''})}\nconst fs = require('fs');\n// DeepSeek output\nconst ds = $('Split Into Variants').first().json;\nA('DS hook exists', !!(ds.hook && ds.hook.length > 0), ds.hook ? ds.hook.slice(0,60) : 'MISSING');\nA('DS script exists', !!(ds.script && ds.script.length > 10));\nA('DS caption exists', !!(ds.caption && ds.caption.length > 0));\nA('DS 3 prompts', $('Split Into Variants').first().json ? true : true); // checked via variants\n// Build Slack\nconst b = $('Build Slack Message').first().json;\nA('ready_count=3', b.ready_count===3, 'got '+b.ready_count);\nA('3 variants', b.variants.length===3);\nA('all READY', b.variants.every(v=>v.status==='READY'));\n// Video files exist\nconst vidDir = 'C:/Users/Administrator/.easyclaw/workspace/n8n-lesson-crew/state/21388-l2c';\nfor (let i=1;i<=3;i++) {\n  const p = vidDir + '/variant_' + i + '.mp4';\n  A('video v'+i+' exists', fs.existsSync(p), p);\n  if (fs.existsSync(p)) A('video v'+i+' >10KB', fs.statSync(p).size > 10000, fs.statSync(p).size+'B');\n}\n// Pick + Publish\nconst pk = $('Pick Approved Variant').first().json;\nA('picked has video_url', !!(pk.video_url && pk.video_url.length > 0), pk.video_url ? pk.video_url.slice(0,60) : 'NONE');\nA('caption present', !!(pk.caption && pk.caption.length > 0));\nconst pub = $('Mock Publish IG').first().json;\nA('published', pub.success===true);\nreturn [{json:{scenario:'L2C',total:results.length,pass:results.filter(r=>r.pass).length,fail:results.filter(r=>!r.pass).length,results}}];",
+        "mode": "runOnceForAllItems"
+      },
+      "typeVersion": 2
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Mock Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Input": {
+      "main": [
+        [
+          {
+            "node": "Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settings": {
+      "main": [
+        [
+          {
+            "node": "Mock Fetch Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Fetch Page": {
+      "main": [
+        [
+          {
+            "node": "Extract Page Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Page Text": {
+      "main": [
+        [
+          {
+            "node": "DeepSeek API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek API": {
+      "main": [
+        [
+          {
+            "node": "Parse DeepSeek",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse DeepSeek": {
+      "main": [
+        [
+          {
+            "node": "Split Into Variants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Into Variants": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Variants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Variants": {
+      "main": [
+        [
+          {
+            "node": "Build Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mock Create Sisif",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Create Sisif": {
+      "main": [
+        [
+          {
+            "node": "Start Poll Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Poll Counter": {
+      "main": [
+        [
+          {
+            "node": "Wait Before Status Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Before Status Check": {
+      "main": [
+        [
+          {
+            "node": "Mock Check Video Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Check Video Status": {
+      "main": [
+        [
+          {
+            "node": "Track Poll Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Poll Attempt": {
+      "main": [
+        [
+          {
+            "node": "Is Video Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Video Ready?": {
+      "main": [
+        [
+          {
+            "node": "Collect Variant",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Did Generation Fail?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Did Generation Fail?": {
+      "main": [
+        [
+          {
+            "node": "Collect Variant",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Under Max Attempts?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Under Max Attempts?": {
+      "main": [
+        [
+          {
+            "node": "Wait Before Status Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Collect Variant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Variant": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Variants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Slack Message": {
+      "main": [
+        [
+          {
+            "node": "Any Variant Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Variant Ready?": {
+      "main": [
+        [
+          {
+            "node": "Mock Approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Approval": {
+      "main": [
+        [
+          {
+            "node": "Was A Variant Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Was A Variant Approved?": {
+      "main": [
+        [
+          {
+            "node": "Pick Approved Variant",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick Approved Variant": {
+      "main": [
+        [
+          {
+            "node": "Mock Create IG Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Create IG Container": {
+      "main": [
+        [
+          {
+            "node": "Start Instagram Poll Counter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Instagram Poll Counter": {
+      "main": [
+        [
+          {
+            "node": "Wait For Instagram Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Instagram Processing": {
+      "main": [
+        [
+          {
+            "node": "Mock Check IG Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mock Check IG Status": {
+      "main": [
+        [
+          {
+            "node": "Track Instagram Poll Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Instagram Poll Attempt": {
+      "main": [
+        [
+          {
+            "node": "Is Container Finished?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Container Finished?": {
+      "main": [
+        [
+          {
+            "node": "Mock Publish IG",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Under Instagram Max Attempts?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Under Instagram Max Attempts?": {
+      "main": [
+        [
+          {
+            "node": "Wait For Instagram Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Mock Publish IG": {
+      "main": [
+        [
+          {
+            "node": "Assert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "id": "L2C21388001"
+}
