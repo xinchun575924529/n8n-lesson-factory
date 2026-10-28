@@ -1,0 +1,37 @@
+{
+  "id": 21716,
+  "slug": "generate-short-form-video-scripts-and-render-9-1",
+  "dir": "projects/21716-generate-short-form-video-scripts-and-render-9-1",
+  "name": "Generate short-form video scripts and render 9:16 clips with OpenAI and Creatomate",
+  "url": "https://n8n.io/workflows/21716/",
+  "views": 16,
+  "recent": 80,
+  "nodeCount": 6,
+  "nodeTypes": [
+    "httpRequest",
+    "webhook",
+    "switch",
+    "respondToWebhook",
+    "stickyNote",
+    "code"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/10/28 11:23:40",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/10/28 11:23:40",
+  "updatedAt": "2026/10/28 11:23:40",
+  "history": [
+    {
+      "at": "2026/10/28 11:23:40",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/21716-generate-short-form-video-scripts-and-render-9-1"
+  },
+  "nameZh": "用OpenAI和Creatomate生成短视频脚本并渲染9:16片段"
+}
