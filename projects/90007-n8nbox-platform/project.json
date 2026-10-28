@@ -1,0 +1,28 @@
+{
+  "id": "90007",
+  "slug": "n8nbox-platform",
+  "name": "n8nbox.cn commercial loop platform (Next.js full-stack: portal, course storefront, payment delivery, deployment service tickets)",
+  "nameZh": "n8nbox.cn 商业闭环平台（Next.js 全栈：门户+课程商城+支付交付+部署服务工单）",
+  "mode": "B",
+  "status": "research",
+  "selectedAt": "2026/10/28 18:39:00",
+  "site": "https://n8nbox.cn",
+  "repo": null,
+  "history": [
+    {
+      "ts": "2026-10-28",
+      "event": "selected",
+      "note": "老板立项原话：现在有了域名，前端包括后台、客户端开发可以同步，获客视频-课程销售-项目部署服务综合考虑，搭建一个比较完整的框架"
+    },
+    {
+      "ts": "2026-10-28",
+      "event": "decisions",
+      "note": "老板拍板三项：①技术路线=Next.js 全栈框架 ②用户体系=免注册（手机号+订单号）③实施=三期一把梭（M1地基+M2交易闭环+M3服务转化连续推进）。同日 ICP 备案通过（皖ICP备2026037701号，域名 n8nbox.cn）；ECS 47.101.64.102 升配 4C8G"
+    },
+    {
+      "ts": "2026-10-28",
+      "event": "framework-v2",
+      "note": "设计图纸 docs/n8nbox-platform-framework.md v2：Next.js 15 全栈（SSG 页面+API routes）+ n8n 自动化总线（支付编排/交付/工单/飞书镜像，研发→工厂交接面不变）+ ECS SQLite WAL 交易库 + 飞书多维表格=老板管理后台 + H5 客户端免注册。专属会话「研发·90007-n8nbox平台」"
+    }
+  ]
+}
