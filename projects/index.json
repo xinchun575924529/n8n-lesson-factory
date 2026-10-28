@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-25 10:49:23",
+  "updatedAt": "2026-10-28 11:26:10",
   "projects": [
     {
       "id": 8965,
@@ -296,6 +296,16 @@
       "mode": "B",
       "selectedAt": "2026/10/25 10:45:37",
       "nameZh": "用OpenAI、Sisif和Slack从产品URL创建UGC风格Instagram Reels"
+    },
+    {
+      "id": 21716,
+      "slug": "generate-short-form-video-scripts-and-render-9-1",
+      "dir": "projects/21716-generate-short-form-video-scripts-and-render-9-1",
+      "name": "Generate short-form video scripts and render 9:16 clips with OpenAI and Creatomate",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/10/28 11:23:40",
+      "nameZh": "用OpenAI和Creatomate生成短视频脚本并渲染9:16片段"
     }
   ]
 }
