@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-28 11:26:10",
+  "updatedAt": "2026-10-29 09:44:47",
   "projects": [
     {
       "id": 8965,
@@ -306,6 +306,15 @@
       "mode": "B",
       "selectedAt": "2026/10/28 11:23:40",
       "nameZh": "用OpenAI和Creatomate生成短视频脚本并渲染9:16片段"
+    },
+    {
+      "id": 13291,
+      "slug": "build-a-wordpress-rag-chatbot-with-openai-qdrant",
+      "dir": "projects/13291-build-a-wordpress-rag-chatbot-with-openai-qdrant",
+      "name": "Build a WordPress RAG chatbot with OpenAI, Qdrant or MongoDB Atlas",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/10/29 09:25:01"
     }
   ]
 }
