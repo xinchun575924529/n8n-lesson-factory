@@ -1,4 +1,4 @@
-# 20558 L2 验证报告（A+B 全绿 / C 待 DeepSeek 充值）
+# 20558 L2 验证报告（A+B+C 三关全绿 ✅）
 
 模板：https://n8n.io/workflows/20558/ （工作日 AI 新闻晨报 → Slack，You.com + TypeSafe Jev）
 
@@ -25,9 +25,13 @@
 4. **去重历史不随 import:workflow 覆盖清空**：复跑前必须先把节点切 `clearDeduplicationHistory` 跑一次（模板自带警告的实操版，已固化进 runner）。
 5. runOnceForEachItem 模式 Code 节点必须返回单对象 `{json:...}`，返回数组报 `A 'json' property isn't an object`。
 
-## L2-C 免费真跑：⏸️ 链路全通，卡在 DeepSeek 余额
+## L2-C 免费真跑：✅ 全绿（2026-11-01 充值后重跑通过）
 
-- 工作流 `L2Cstm20558001`（16 节点）：HN Algolia 免费 API 换 You.com、DeepSeek 换 Jev+Research、飞书群换 Slack
-- 实测：执行 success，HN 真搜 12 篇、过滤链全跑通；**DeepSeek 返回 402 Insufficient Balance**（key sk-3bdc…74b1274），评分全部落兜底 0 → 0 篇过阈值 → 飞书 0 推送（符合模板「无 material news 不发帖」语义）
-- 🕳️ 额外坑：Google News RSS 本机被墙超时；Bing News RSS 返回 HTML 反爬页（RSS 解析器 Invalid attribute name）；**HN Algolia API（免 key）是本机唯一通畅的英文新闻源**
-- 解锁条件：DeepSeek 充值后重跑 `run-l2c-20558.py` 即可（脚本就绪）
+- 工作流 `L2Cstm20558001`（16 节点）：HN Algolia 免费 API 换 You.com、DeepSeek 换 Jev+Research、飞书群换 Slack；生成器 `build-l2c-20558.py`，驱动 `run-l2c-20558.py`（含去重历史预清），结果 `l2c-20558-result.json`
+- 真跑：HN 真搜 12 篇 → DeepSeek 真评 12 篇（1 篇 0.85/0.9/2 过阈值：Mistral 4 发布，Reuters 源）→ DeepSeek 写真晨报 → **飞书群推送 code 0** ✅
+- 推送成品实测：`*AI model releases: morning brief*` + `_1 new article since yesterday_` + 带 `<url|[1]>` 引用的 bullet，格式与模板 Slack mrkdwn 完全一致
+- 🕳️ C 关新增坑：
+  6. Google News RSS 本机被墙超时；Bing News RSS 返 HTML 反爬页（RSS 解析器 Invalid attribute name）；**HN Algolia API（免 key）是本机唯一通畅的英文新闻源**
+  7. HTTP 节点 `includeInputData` 在本机不可靠（topic 丢成 null）→ Code 节点用 `$('Config').first().json.topics` 按输入顺序对齐
+  8. **jsonBody 外层 `={{ }}` 里嵌套 `{{ }}` 占位符会静默失败**（DeepSeek 返回体无 choices，评分全落兜底 0 且不报错）→ prompt 内容必须用 JS 拼接构造；判 C 关失败先查余额（402 会走 onError 静默过）
+- 首跑曾遇 DeepSeek 402 余额不足（账户 -0.02），充值 50 后一把过
