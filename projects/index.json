@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-31 19:31:43",
+  "updatedAt": "2026-11-23 09:48:06",
   "projects": [
     {
       "id": 8965,
@@ -325,6 +325,38 @@
       "mode": "B",
       "selectedAt": "2026/10/31 19:23:00",
       "nameZh": "用You.com和TypeSafe Jev向Slack发送工作日AI新闻简报"
+    },
+    {
+      "id": "90007",
+      "slug": "cashier-payment-auto-delivery",
+      "dir": "n8nbox/app",
+      "name": "Cashier + Alipay payment + auto course delivery (track C)",
+      "nameZh": "收银台：支付宝支付+课程自动履约（轨道C）",
+      "status": "live",
+      "mode": "B",
+      "note": "2026-11-02~06 建成验收，历史沿用号，2026-11-12 补登记",
+      "registeredAt": "2026-11-12 08:00:00"
+    },
+    {
+      "id": "90008",
+      "slug": "remote-deploy-service-monetization",
+      "dir": "n8n-lesson-crew/state/factory/briefs/90008-build-order.md",
+      "name": "Remote deploy service monetization (paid tier on top of free courses)",
+      "nameZh": "部署服务变现：¥99 远程部署服务上架 + 付费钩子三处 + 获客视频 3 条/周",
+      "status": "building",
+      "mode": "B",
+      "decidedAt": "2026-11-12 07:53:00",
+      "registeredAt": "2026-11-12 08:00:00"
+    },
+    {
+      "id": 21826,
+      "slug": "triage-website-form-enquiries-with-openai-and-go",
+      "dir": "projects/21826-triage-website-form-enquiries-with-openai-and-go",
+      "name": "Triage website form enquiries with OpenAI and Google Sheets",
+      "status": "research",
+      "mode": "B",
+      "selectedAt": "2026/11/23 09:18:20",
+      "nameZh": "用OpenAI和Google Sheets分诊网站表单咨询"
     }
   ]
 }
