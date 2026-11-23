@@ -1,0 +1,39 @@
+{
+  "id": 21826,
+  "slug": "triage-website-form-enquiries-with-openai-and-go",
+  "dir": "projects/21826-triage-website-form-enquiries-with-openai-and-go",
+  "name": "Triage website form enquiries with OpenAI and Google Sheets",
+  "url": "https://n8n.io/workflows/21826/",
+  "views": 47,
+  "recent": 13,
+  "nodeCount": 18,
+  "nodeTypes": [
+    "googleSheets",
+    "if",
+    "merge",
+    "set",
+    "slack",
+    "webhook",
+    "executeWorkflow",
+    "switch"
+  ],
+  "selection": {
+    "mode": "B",
+    "at": "2026/11/23 09:18:20",
+    "by": "ou_505161df2dcf20cbd42e367100f950b2"
+  },
+  "status": "research",
+  "createdAt": "2026/11/23 09:18:20",
+  "updatedAt": "2026/11/23 09:18:20",
+  "history": [
+    {
+      "at": "2026/11/23 09:18:20",
+      "event": "selected",
+      "mode": "B"
+    }
+  ],
+  "github": {
+    "treeUrl": "https://github.com/xinchun575924529/n8n-lesson-factory/tree/main/projects/21826-triage-website-form-enquiries-with-openai-and-go"
+  },
+  "nameZh": "用OpenAI和Google Sheets分诊网站表单咨询"
+}
