@@ -1,0 +1,632 @@
+{
+  "id": 11789,
+  "name": "Convert WordPress articles into multilingual voiceovers with Google TTS and OpenAI",
+  "workflow": {
+    "id": "Y922kkg7x1BKIhAe",
+    "meta": {
+      "instanceId": "9d797abf871ff7776b72030f386aac63fbb09752ce3bb94854a66e7091951bfc"
+    },
+    "name": "WordPress VoiceOvers v1.3",
+    "tags": [],
+    "nodes": [
+      {
+        "id": "a74ac139-3c17-4a35-bcc1-0b068ba97ff6",
+        "name": "Fetch Recent WordPress Posts",
+        "type": "n8n-nodes-base.wordpress",
+        "maxTries": 3,
+        "position": [
+          1392,
+          -352
+        ],
+        "parameters": {},
+        "retryOnFail": true,
+        "typeVersion": 1,
+        "waitBetweenTries": 5000
+      },
+      {
+        "id": "b0118b26-82c5-4d94-8fc9-43ffab31416f",
+        "name": "Extract Article Text",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          1632,
+          -352
+        ],
+        "parameters": {},
+        "typeVersion": 2
+      },
+      {
+        "id": "7db31f3c-bbce-4dfe-97b6-4e8dfbbd49f0",
+        "name": "Save Posts to Processing Queue",
+        "type": "n8n-nodes-base.googleSheets",
+        "position": [
+          1872,
+          -352
+        ],
+        "parameters": {},
+        "typeVersion": 4.5
+      },
+      {
+        "id": "7950433d-5c3d-4a5f-8f25-b8f2c75903da",
+        "name": "Daily Schedule",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "position": [
+          1152,
+          -352
+        ],
+        "parameters": {},
+        "typeVersion": 1.2
+      },
+      {
+        "id": "8a9ea6bc-84a1-4924-a788-f01ea971560a",
+        "name": "Mark Post as Completed",
+        "type": "n8n-nodes-base.googleSheets",
+        "maxTries": 3,
+        "position": [
+          4736,
+          -352
+        ],
+        "parameters": {},
+        "retryOnFail": true,
+        "typeVersion": 4.5,
+        "waitBetweenTries": 5000
+      },
+      {
+        "id": "91134351-c999-456d-86a5-7a54c274c7c0",
+        "name": "Prepare English TTS Text",
+        "type": "n8n-nodes-base.code",
+        "onError": "continueErrorOutput",
+        "position": [
+          3216,
+          -368
+        ],
+        "parameters": {},
+        "typeVersion": 2
+      },
+      {
+        "id": "42bf57fa-655b-4765-9b03-081cfaa77ee9",
+        "name": "Prepare Italian TTS Text",
+        "type": "n8n-nodes-base.code",
+        "onError": "continueErrorOutput",
+        "position": [
+          2976,
+          0
+        ],
+        "parameters": {},
+        "typeVersion": 2
+      },
+      {
+        "id": "33607bae-b5cf-42d0-b339-6278537de87c",
+        "name": "Generate Italian VoiceOver",
+        "type": "n8n-nodes-base.httpRequest",
+        "onError": "continueErrorOutput",
+        "position": [
+          3216,
+          -16
+        ],
+        "parameters": {},
+        "typeVersion": 4.2
+      },
+      {
+        "id": "dfda6937-776c-449a-b66c-0a3c8c558c54",
+        "name": "Read English VoiceOver Page",
+        "type": "n8n-nodes-base.wordpress",
+        "onError": "continueErrorOutput",
+        "maxTries": 3,
+        "position": [
+          3728,
+          -400
+        ],
+        "parameters": {},
+        "retryOnFail": true,
+        "typeVersion": 1,
+        "waitBetweenTries": 5000
+      },
+      {
+        "id": "662f0520-e129-44ee-9c5e-0b52e1f473bc",
+        "name": "Read Italian VoiceOver Page",
+        "type": "n8n-nodes-base.wordpress",
+        "onError": "continueErrorOutput",
+        "maxTries": 3,
+        "position": [
+          3472,
+          -32
+        ],
+        "parameters": {},
+        "retryOnFail": true,
+        "typeVersion": 1,
+        "waitBetweenTries": 5000
+      },
+      {
+        "id": "47faa9c0-b9ad-4be6-80e5-9471dac576f0",
+        "name": "Publish English Audio Player",
+        "type": "n8n-nodes-base.wordpress",
+        "onError": "continueErrorOutput",
+        "maxTries": 3,
+        "position": [
+          3984,
+          -416
+        ],
+        "parameters": {},
+        "retryOnFail": true,
+        "typeVersion": 1,
+        "waitBetweenTries": 5000
+      },
+      {
+        "id": "2bb555be-1949-4b7b-aa7b-9134717029d7",
+        "name": "Publish Italian Audio Player",
+        "type": "n8n-nodes-base.wordpress",
+        "onError": "continueErrorOutput",
+        "maxTries": 3,
+        "position": [
+          3728,
+          -48
+        ],
+        "parameters": {},
+        "retryOnFail": true,
+        "typeVersion": 1,
+        "waitBetweenTries": 5000
+      },
+      {
+        "id": "f814d8d7-afdb-4862-ad5b-a73ba3b2dcd8",
+        "name": "Select Oldest Pending Post",
+        "type": "n8n-nodes-base.code",
+        "position": [
+          2608,
+          -352
+        ],
+        "parameters": {},
+        "typeVersion": 2
+      },
+      {
+        "id": "f416297e-668e-4b05-8cb9-69c286d9b26d",
+        "name": "Translate Article to English",
+        "type": "n8n-nodes-base.googleTranslate",
+        "onError": "continueErrorOutput",
+        "maxTries": 3,
+        "position": [
+          2992,
+          -352
+        ],
+        "parameters": {},
+        "retryOnFail": true,
+        "typeVersion": 2,
+        "waitBetweenTries": 5000
+      },
+      {
+        "id": "c1c4b54b-03e0-4f73-9a05-131bbc8f1f83",
+        "name": "Generate English VoiceOver",
+        "type": "n8n-nodes-base.httpRequest",
+        "onError": "continueErrorOutput",
+        "position": [
+          3456,
+          -384
+        ],
+        "parameters": {},
+        "typeVersion": 4.2
+      },
+      {
+        "id": "a87ad9c9-b152-4c3d-b1c3-82838d2938cf",
+        "name": "Read Processing Queue",
+        "type": "n8n-nodes-base.googleSheets",
+        "position": [
+          2368,
+          -352
+        ],
+        "parameters": {},
+        "typeVersion": 4.5
+      },
+      {
+        "id": "ec9f0416-bbd1-4907-9a12-333415609502",
+        "name": "Wait Before Queue Processing",
+        "type": "n8n-nodes-base.wait",
+        "position": [
+          2112,
+          -352
+        ],
+        "webhookId": "404a36ce-4a54-46e7-bd19-b8f759eddd6a",
+        "parameters": {},
+        "typeVersion": 1.1
+      },
+      {
+        "id": "8a4ee887-18a4-41a7-854a-42c811c907d7",
+        "name": "Wait for Both Publications",
+        "type": "n8n-nodes-base.merge",
+        "position": [
+          4480,
+          -352
+        ],
+        "parameters": {},
+        "typeVersion": 3.2
+      },
+      {
+        "id": "58181078-3b76-498d-b302-4fd970e75f92",
+        "name": "Record Processing Failure",
+        "type": "n8n-nodes-base.googleSheets",
+        "position": [
+          4688,
+          16
+        ],
+        "parameters": {},
+        "typeVersion": 4.5
+      },
+      {
+        "id": "addc4d16-9512-4e02-b4aa-99426bfb45b6",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          480,
+          -512
+        ],
+        "parameters": {
+          "content": ""
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "0e7a5da0-fc37-4346-9fa8-575a83ad8ee5",
+        "name": "Combine TTS Error Outputs",
+        "type": "n8n-nodes-base.merge",
+        "position": [
+          4432,
+          16
+        ],
+        "parameters": {},
+        "typeVersion": 3.2
+      },
+      {
+        "id": "2ac689e2-ad51-4bf3-82cb-302b5e7d75e8",
+        "name": "Section Note 1",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          1104,
+          -512
+        ],
+        "parameters": {
+          "content": ""
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "3f4d56d7-d6aa-43e7-a1f8-5502bffeae94",
+        "name": "Section Note 2",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          2304,
+          -512
+        ],
+        "parameters": {
+          "content": ""
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "ea0e7d0c-1c80-4a46-b1ac-7c1ac2e5e3b5",
+        "name": "Section Note 3",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          2880,
+          -512
+        ],
+        "parameters": {
+          "content": ""
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "80ace4ea-b1f0-4733-9bf9-a828b742ee6f",
+        "name": "Section Note 4",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          2880,
+          -144
+        ],
+        "parameters": {
+          "content": ""
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "f076e442-299e-4004-8eb9-f800e3c8aee3",
+        "name": "Section Note 5",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          4352,
+          -496
+        ],
+        "parameters": {
+          "content": ""
+        },
+        "typeVersion": 1
+      },
+      {
+        "id": "7d03d69a-38c0-4b96-a0a0-494b93aaad2d",
+        "name": "Section Note 6",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          4352,
+          -128
+        ],
+        "parameters": {
+          "content": ""
+        },
+        "typeVersion": 1
+      }
+    ],
+    "active": false,
+    "pinData": {},
+    "settings": {
+      "binaryMode": "separate",
+      "executionOrder": "v1"
+    },
+    "versionId": "21026084-a59a-47ef-a9d9-92f5059286d5",
+    "nodeGroups": [],
+    "connections": {
+      "Daily Schedule": {
+        "main": [
+          [
+            {
+              "node": "Fetch Recent WordPress Posts",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Article Text": {
+        "main": [
+          [
+            {
+              "node": "Save Posts to Processing Queue",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Processing Queue": {
+        "main": [
+          [
+            {
+              "node": "Select Oldest Pending Post",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare English TTS Text": {
+        "main": [
+          [
+            {
+              "node": "Generate English VoiceOver",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Italian TTS Text": {
+        "main": [
+          [
+            {
+              "node": "Generate Italian VoiceOver",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Combine TTS Error Outputs": {
+        "main": [
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate English VoiceOver": {
+        "main": [
+          [
+            {
+              "node": "Read English VoiceOver Page",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Combine TTS Error Outputs",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Italian VoiceOver": {
+        "main": [
+          [
+            {
+              "node": "Read Italian VoiceOver Page",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Combine TTS Error Outputs",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Select Oldest Pending Post": {
+        "main": [
+          [
+            {
+              "node": "Translate Article to English",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Prepare Italian TTS Text",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait for Both Publications": {
+        "main": [
+          [
+            {
+              "node": "Mark Post as Completed",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read English VoiceOver Page": {
+        "main": [
+          [
+            {
+              "node": "Publish English Audio Player",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Italian VoiceOver Page": {
+        "main": [
+          [
+            {
+              "node": "Publish Italian Audio Player",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Fetch Recent WordPress Posts": {
+        "main": [
+          [
+            {
+              "node": "Extract Article Text",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Publish English Audio Player": {
+        "main": [
+          [
+            {
+              "node": "Wait for Both Publications",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Publish Italian Audio Player": {
+        "main": [
+          [
+            {
+              "node": "Wait for Both Publications",
+              "type": "main",
+              "index": 1
+            }
+          ],
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Translate Article to English": {
+        "main": [
+          [
+            {
+              "node": "Prepare English TTS Text",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Record Processing Failure",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Wait Before Queue Processing": {
+        "main": [
+          [
+            {
+              "node": "Read Processing Queue",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Save Posts to Processing Queue": {
+        "main": [
+          [
+            {
+              "node": "Wait Before Queue Processing",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    }
+  }
+}
