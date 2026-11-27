@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-23 09:48:06",
+  "updatedAt": "2026-11-27 09:18:09",
   "projects": [
     {
       "id": 8965,
@@ -357,6 +357,16 @@
       "mode": "B",
       "selectedAt": "2026/11/23 09:18:20",
       "nameZh": "用OpenAI和Google Sheets分诊网站表单咨询"
+    },
+    {
+      "id": 11789,
+      "slug": "convert-wordpress-articles-into-multilingual-voi",
+      "dir": "projects/11789-convert-wordpress-articles-into-multilingual-voi",
+      "name": "Convert WordPress articles into multilingual voiceovers with Google TTS and OpenAI",
+      "status": "backlog",
+      "mode": "A",
+      "selectedAt": "2026/11/27 08:57:40",
+      "nameZh": "将WordPress文章用Google TTS和OpenAI转换为多语言语音"
     }
   ]
 }
